@@ -14,7 +14,7 @@ Google Calendar / Microsoft 365 統合・参照専用 Windows 常駐アプリ
 
 **設計原則:** 個人向け常駐アプリとして、保守性と実装容易性を優先
 
-**初期正式版:** 1.0.0（Semantic Versioning）
+**初期正式版:** 1.0.0（Semantic Versioning）。**1.1.0でメイン画面の設定ボタン、最小幅の縮小、予定開始前の通知を追加する（17章「1.1.0 の作業」）。**
 
 > **設計の結論**  UI、同期、表示ルール、Provider、ファイルI/Oを明確に分ける。ただしプロジェクト数は6つに留め、抽象化は外部API・OS・永続化・時刻・UIスレッドの境界にだけ置く。
 
@@ -42,10 +42,11 @@ Google Calendar / Microsoft 365 統合・参照専用 Windows 常駐アプリ
 - [12. WPF / MVVM構成、Dispatcher方針、UI virtualization](12-wpf-mvvm-dispatcher-virtualization.md)
 - [13. ウィンドウ・トレイ・単一インスタンス・DPI](13-window-tray-single-instance-dpi.md)
 - [14. ログ設計](14-logging.md)
-- [15. テスト戦略とACC-001～ACC-012マトリクス](15-testing-and-acceptance.md)
+- [15. テスト戦略とACC-001～ACC-013マトリクス](15-testing-and-acceptance.md)
 - [16. セキュリティ・プライバシー](16-security-and-privacy.md)
 - [17. Codex向け実装フェーズ分割とDefinition of Done](17-implementation-phases.md)
 - [18. 製品判断TBDと初期版対象外](18-product-tbd-and-out-of-scope.md)
+- [19. 予定開始前の通知](19-notifications.md)
 - [付録 A. 確定デフォルト / 実装定数](appendix-a.md)
 - [付録 B. 技術参照（2026-08-27確認）](appendix-b.md)
 

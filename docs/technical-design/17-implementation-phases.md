@@ -458,3 +458,59 @@ Phase 8 の着手前に、持ち越しのうち判断を要する事項を決定
 - **`build-installer.ps1 -NoSign` は署名済みインストーラを同名で黙って上書きする。** 実際に一度上書きした。出力ファイル名を分ける案は採らず、**配布前に必ず `build.ps1` → `build-installer.ps1`（既定で署名する）を通す手順で担保する。**
 
 - **資格情報の環境変数名の綴り違いは検出できない。** `UnifiedCalendar__Google_ClientSecret`（アンダースコア1つ）と書いた事故が起きたが、D98 の歯止めは**不在を警告するだけで、近い名前の存在を指摘できない。** 綴り違いの検知と、資格情報をファイルから読む `build-release.ps1` は**保留とした。**
+
+## 1.1.0 の作業（2026-09-08 着手）
+
+**1.0.0 の出荷後に受けた3件の機能追加である。** 製品の機能を変えるため、基準仕様書と本書を先に改訂し、そのうえで実装の指示書を出した。
+
+| # | 内容 | 決定 | 指示書 | 受入記号 |
+| --- | --- | --- | --- | --- |
+| 1 | メイン画面から設定画面を開く歯車ボタン | D120〜D122 | `handoff-main-window-settings-button.md` | KK |
+| 2 | メイン画面の最小幅を 560 → 370 DIP | D123〜D126 | `handoff-main-window-minimum-width.md` | LL |
+| 3 | 予定開始前の通知 | D127〜D136 | `handoff-event-start-notifications.md` | MM |
+
+### 決定記録
+
+| 決定 | 内容 |
+| --- | --- |
+| D120 | 歯車ボタンをステータス領域の右端（手動更新ボタンの右）に置く。`Segoe MDL2 Assets`の`E713`、`Width=32`、高さは`WarningButtonHeight`。新規リソース`Status.Settings`を使い、トレイの`Tray.Settings`を流用しない |
+| D121 | コマンドは`MainWindowViewModel`に持たせ、`ISettingsWindowLauncher`は**両ctorの末尾の任意パラメータ**で注入する（既存の呼び出しを壊さないため）。失敗は`MainWindowActionFailed`で警告し、例外をUIへ伝播させない |
+| D122 | `IsAvailable=false`のときは非表示にせず無効化する。Tab順は 更新`0` → 歯車`1` → 一覧`2` → 未登録状態の追加ボタン`3`/`4`。専用ショートカットは設けない（KEY-010を維持） |
+| D123 | `LayoutMetrics.MinimumMainWidth`を`560d`→`370d`。最小高さ・初期サイズ・設定画面の値は変えない |
+| D124 | ステータス領域の最終正常更新時刻の列を可変幅（`*`）にし、`TextTrimming=CharacterEllipsis`で切る。現在時刻・警告・更新ボタン・歯車は切らせない。**370を成立させるための必須の変更である**（既定フォントでの必要幅は、最終更新を含めると約392、除くと約244と見積った） |
+| D125 | 最小内容幅の算出を独立したクラスへ置き、**フォント10 / 14 / 24 DIPのいずれでも370以下であること**をテストで固定する。`Window.MinWidth`は定数のまま束縛し、算出値は検証専用とする |
+| D126 | 詳細ポップアップの最大幅520は変えない。メインウィンドウより広くなることを許容し、画面外へ出ないことは既存の配置補正に委ねる |
+| D127 | 解禁するのは予定開始前の通知だけ。同期エラー・レート制限・予定終了の通知とアイコン変更は引き続き行わない。サウンドの設定項目は設けない |
+| D128 | 方式は`NotifyIcon.ShowBalloonTip`。`ITrayIconAdapter`へメソッドを追加し、`Phase7ShellTests`の契約テストは**消さずに反転**する。`BalloonTipText`/`BalloonTipTitle`/`Icon`/`PlaySound`の禁止は残す |
+| D129 | `NotificationPreferences(Enabled = true, LeadMinutes = 5)`、範囲1〜60。`AppSettings`へは末尾追加。**既定ONのため、1.0.0から更新した利用者は設定を触らずに通知が出始める** |
+| D130 | settings.jsonをv2へ。`SettingsSchemaV1ToV2Migration`を追加し、登録はDIと`SettingsJsonStore`の既定配列の2箇所。v1を隔離してはならない。**v2を1.0.0で読むとnewer判定で退避され、アカウント登録が失われる**（既存仕様どおりの挙動として据え置く） |
+| D131 | 判定は分境界の`InternalRefreshSignal`へ相乗りし、新しいタイマーを作らない。投影は`EventNotificationHostedService`が自前で行い、`MainWindowViewModel`に通知の責務を持たせない。1分あたりの二重投影のコストは計測して判断する |
+| D132 | 同じ判定で複数該当したときは1通に集約する（最も早い1件＋件数）。該当した全件を既通知として登録する |
+| D133 | 対象は時刻付き予定のみ。キーは`StableId`と開始時刻の組。絞り込みは表示と同じ`CalendarPresentationService`の経路を通す。既通知集合は永続化しない |
+| D134 | 文面は`Notification.Title` / `Body` / `BodyMore`。組み立てはApp側で行い、Coreのplannerは値を返すだけにする。本文は200文字で切る。ログに件名・場所・URLを出さない |
+| D135 | 通知のクリック動作は実装しない。サウンドはOSの既定に従う。`timeoutMilliseconds`は固定値10000とし、設定項目にしない（近年のWindowsは無視する） |
+| D136 | 設定カテゴリ『通知』を`update`と`general`の間へ追加し7カテゴリにする。変更は即時反映。`Enabled=false`のとき分のスピナーを無効化する。SET-019の初期化対象に通知設定を含める |
+
+### 改訂した文書（2026-09-08）
+
+| 文書 | 改訂 |
+| --- | --- |
+| `specification.md` | 版1.1へ。製品方針、FUN-010（新設）、UI-002、UI-004、UI-013、SET-019、SET-021 / SET-022（新設）、ERR-013、WIN-003、WIN-015、**13.3 通知（新設、NTF-001〜NTF-010）**、13章の章題、18章の対象外、ACC-011、ACC-013（新設）、目次 |
+| `technical-design/19-notifications.md` | **新設。** 通知の設計 |
+| `technical-design/10-settings-cache-schema.md` | settings.json v2、`notifications`、`leadMinutes`の検証、移行とダウングレードの注記 |
+| `technical-design/13-window-tray-single-instance-dpi.md` | メインの寸法（最小幅370）、設定ボタン、トレイのバルーン通知 |
+| `technical-design/15-testing-and-acceptance.md` | 章題をACC-013まで、ACC-011の見直し、ACC-013の追加、品質ゲート |
+| `technical-design/18-product-tbd-and-out-of-scope.md` | 18.1から通知を外し、引き続き対象外とするものを明示 |
+| `technical-design/README.md` | 19章の追加、15章の章題、1.1.0の言及 |
+
+### 出荷時にやること
+
+- **`docs/index.md` と `docs/terms.md` の「通知は提供しません」を直す。** どちらも公開ページであり、`terms.md` はインストーラのEULAの出所でもある。**1.1.0を出すときに直す。** 実装前に直すと、出荷済みの1.0.0の説明として誤りになる。
+
+- `src/UnifiedCalendar.App/UnifiedCalendar.App.csproj` の `Version` を `1.1.0` へ上げる。**3件がそろってから行う。** 各指示書では触らせない。インストーラのファイル名（`UnifiedCalendar-Setup-1.1.0.exe`）が連動する。
+
+- `installer\UnifiedCalendar.iss` の `AppId` は変えない。上書きインストールで1.0.0を置き換える。
+
+- **ダウングレードの注意を配布時に伝える。** 1.1.0を入れた後に1.0.0へ戻すと、設定がnewer判定で退避されアカウントの再認証が必要になる（10.2）。
+
+- `docs/acceptance-*.md`（非公開）へ実機受入の記録を残す。ACC-013と、370 DIPでの見え方、集中モード時の通知の挙動を含める。

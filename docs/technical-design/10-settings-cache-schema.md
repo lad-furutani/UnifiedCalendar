@@ -14,17 +14,18 @@
 
 正式製品名確定後にトップフォルダ名を変更する。AppPathsへ集約し、文字列を各Storeへ直書きしない。通常設定とキャッシュは平文であり、予定件名・説明・場所・URL・アカウント表示情報がWindowsユーザープロファイル内に残る。
 
-## 10.2 settings.json v1
+## 10.2 settings.json v2
 
 ```text
 {
-  "schemaVersion": 1,
+  "schemaVersion": 2,
   "display": {
     "days": 7, "fontSizeDip": 14, "density": "standard",
     "defaultEventColor": "#2F6FED"
   },
   "sync": { "intervalMinutes": 5 },
   "general": { "startWithWindows": true },
+  "notifications": { "enabled": true, "leadMinutes": 5 },
   "windows": {
     "main": { "leftDip": 0, "topDip": 0, "widthDip": 0,
       "heightDip": 0, "monitorDeviceName": "...",
@@ -45,9 +46,13 @@
 
 - JSONはUTF-8（BOMなし）、camelCase、enumはcamelCase文字列、日付時刻はUTCのISO 8601 round-trip、色は不透明#RRGGBB。
 
-- fontSizeDipは10～24、daysは1～90、intervalMinutesは1/5/10/15/30/60だけをvalidationで許可する。
+- fontSizeDipは10～24、daysは1～90、intervalMinutesは1/5/10/15/30/60、leadMinutesは1～60だけをvalidationで許可する。
 
 - ウィンドウ未検証値は0で保存せずnull扱いにし、初期レイアウトへフォールバックする。
+
+- **v2は1.1.0で追加した（2026-09-08 決定）。追加は`notifications`セクションだけである。** `SettingsSchemaV1ToV2Migration`がv1のファイルへ既定値（`enabled: true`、`leadMinutes: 5`）を補い`schemaVersion`を2にする。**v1をそのまま隔離してはならない**（アカウント登録とトークン参照が失われ、再認証が必要になる）。移行の登録先はDIと`SettingsJsonStore`の既定配列の2箇所である。v0のfixtureはv0→v1→v2と連鎖する。
+
+- **1.1.0が保存したv2を1.0.0で読むと、10.5のnewer判定で退避され既定設定になる。** ダウングレードするとアカウント登録が失われる。既存仕様どおりの挙動であり変更しない。
 
 ## 10.3 account cache v1
 

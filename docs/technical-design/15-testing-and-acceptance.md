@@ -1,4 +1,4 @@
-# 15. テスト戦略とACC-001～ACC-012マトリクス
+# 15. テスト戦略とACC-001～ACC-013マトリクス
 
 ## 15.1 テスト層
 
@@ -26,8 +26,9 @@
 | ACC-008 | 更新安定性 | SnapshotDifferでResetなし、同一VM参照維持。実機でscroll anchor/focus確認。 |
 | ACC-009 | テーマ/DPI | 実機でlight/dark切替、100/150/200%モニタ移動、24 DIPでも欠けなし。 |
 | ACC-010 | 単一instance | 2 process integration。pipe activate、第二process終了、Store同時writeなし。 |
-| ACC-011 | 参照専用 | UI/command/API scope/installerのreview。write scope・編集/通知/export/pushがない。 |
+| ACC-011 | 参照専用 | UI/command/API scope/installerのreview。write scopeと編集/export/pushがない。**通知は開始前の表示のみで、通知からの操作導線がない。** |
 | ACC-012 | keyboard | 実機keyboard checklist: Tab/矢印/Enter/Esc/Ctrl+C、focus可視、Space無動作。 |
+| ACC-013 | 開始前通知 | Core unitで境界を検証: 通知時刻ちょうど、開始ちょうど、終日除外、重複、集約、抑制の初期化。実機でバルーン表示と集中モード時の挙動。 |
 
 ## 15.3 品質ゲート
 
@@ -37,4 +38,4 @@
 
 - 1,000件性能目標、30秒timeout、3 retry delay、4並列を計測テストで確認する。
 
-- Release候補でACC-001～012をマトリクスどおり実施し、証跡をdocs/acceptance/へ残す。
+- Release候補でACC-001～013をマトリクスどおり実施し、証跡をdocs/acceptance/へ残す。
