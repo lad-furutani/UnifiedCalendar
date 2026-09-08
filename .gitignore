@@ -6,3 +6,6 @@ outputs/
 work/
 *.user
 *.suo
+docs/handoff-*
+docs/acceptance-*
+*.docx
