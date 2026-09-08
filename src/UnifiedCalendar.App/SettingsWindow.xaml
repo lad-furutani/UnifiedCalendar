@@ -1,0 +1,1476 @@
+<Window x:Class="UnifiedCalendar.App.SettingsWindow"
+        x:Name="SettingsRoot"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:controls="clr-namespace:UnifiedCalendar.App.Controls"
+        xmlns:persistence="clr-namespace:UnifiedCalendar.Core.Persistence;assembly=UnifiedCalendar.Core"
+        xmlns:presentation="clr-namespace:UnifiedCalendar.App.Presentation"
+        xmlns:viewModels="clr-namespace:UnifiedCalendar.App.ViewModels"
+        Title="{Binding Title}"
+        Icon="Resources/UnifiedCalendar.ico"
+        Width="{x:Static presentation:LayoutMetrics.InitialSettingsWidth}"
+        Height="{x:Static presentation:LayoutMetrics.InitialSettingsHeight}"
+        MinWidth="{x:Static presentation:LayoutMetrics.MinimumSettingsWidth}"
+        MinHeight="{x:Static presentation:LayoutMetrics.MinimumSettingsHeight}"
+        WindowStartupLocation="Manual"
+        ShowInTaskbar="True"
+        ResizeMode="CanResize"
+        FontFamily="Yu Gothic UI"
+        FontSize="14"
+        Background="{DynamicResource WindowBackgroundBrush}"
+        Foreground="{DynamicResource PrimaryTextBrush}"
+        PreviewKeyDown="WindowPreviewKeyDown"
+        LocationChanged="WindowLocationChanged"
+        SizeChanged="WindowSizeChanged"
+        StateChanged="WindowStateChanged">
+    <Window.Resources>
+        <BooleanToVisibilityConverter x:Key="BooleanVisibility" />
+        <presentation:ValueVisibilityConverter x:Key="ValueVisibility" />
+        <Style x:Key="SettingsControlForegroundStyle" TargetType="{x:Type Control}">
+            <Setter Property="Foreground" Value="{DynamicResource PrimaryTextBrush}" />
+        </Style>
+        <Style TargetType="{x:Type RepeatButton}"
+               BasedOn="{StaticResource SettingsControlForegroundStyle}">
+            <Setter Property="Background" Value="{DynamicResource ButtonBackgroundBrush}" />
+            <Setter Property="BorderBrush" Value="{DynamicResource BorderBrush}" />
+            <Setter Property="BorderThickness"
+                    Value="{x:Static presentation:LayoutMetrics.SeparatorBorder}" />
+            <Setter Property="HorizontalContentAlignment" Value="Center" />
+            <Setter Property="VerticalContentAlignment" Value="Center" />
+            <Setter Property="Template" Value="{StaticResource ApplicationButtonBaseTemplate}" />
+            <Style.Triggers>
+                <Trigger Property="IsEnabled" Value="False">
+                    <Setter Property="Foreground" Value="{DynamicResource SecondaryTextBrush}" />
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+        <Style TargetType="{x:Type ToggleButton}"
+               BasedOn="{StaticResource SettingsControlForegroundStyle}">
+            <Setter Property="Background" Value="{DynamicResource ButtonBackgroundBrush}" />
+            <Setter Property="BorderBrush" Value="{DynamicResource BorderBrush}" />
+            <Setter Property="BorderThickness"
+                    Value="{x:Static presentation:LayoutMetrics.SeparatorBorder}" />
+            <Setter Property="HorizontalContentAlignment" Value="Center" />
+            <Setter Property="VerticalContentAlignment" Value="Center" />
+            <Setter Property="Template" Value="{StaticResource ApplicationButtonBaseTemplate}" />
+            <Style.Triggers>
+                <Trigger Property="IsEnabled" Value="False">
+                    <Setter Property="Foreground" Value="{DynamicResource SecondaryTextBrush}" />
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+        <Style TargetType="{x:Type PasswordBox}"
+               BasedOn="{StaticResource SettingsControlForegroundStyle}">
+            <Setter Property="Background" Value="{DynamicResource PanelBackgroundBrush}" />
+            <Setter Property="BorderBrush" Value="{DynamicResource BorderBrush}" />
+            <Setter Property="BorderThickness"
+                    Value="{x:Static presentation:LayoutMetrics.SeparatorBorder}" />
+            <Setter Property="Padding"
+                    Value="{x:Static presentation:LayoutMetrics.SettingsSpinnerTextPadding}" />
+            <Setter Property="SelectionBrush" Value="{DynamicResource FocusBrush}" />
+            <Setter Property="SelectionTextBrush" Value="{DynamicResource FocusForegroundBrush}" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type PasswordBox}">
+                        <Border x:Name="StateBorder"
+                                Padding="{TemplateBinding Padding}"
+                                BorderThickness="{TemplateBinding BorderThickness}"
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                Background="{TemplateBinding Background}"
+                                SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}">
+                            <ScrollViewer x:Name="PART_ContentHost"
+                                          TextElement.Foreground="{TemplateBinding Foreground}" />
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="StateBorder"
+                                        Property="BorderBrush"
+                                        Value="{DynamicResource FocusBrush}" />
+                            </Trigger>
+                            <Trigger Property="IsKeyboardFocusWithin" Value="True">
+                                <Setter TargetName="StateBorder"
+                                        Property="BorderBrush"
+                                        Value="{DynamicResource FocusBrush}" />
+                            </Trigger>
+                            <Trigger Property="IsEnabled" Value="False">
+                                <Setter TargetName="StateBorder"
+                                        Property="Background"
+                                        Value="{DynamicResource ButtonBackgroundBrush}" />
+                                <Setter TargetName="StateBorder"
+                                        Property="BorderBrush"
+                                        Value="{DynamicResource BorderBrush}" />
+                                <Setter Property="Foreground"
+                                        Value="{DynamicResource SecondaryTextBrush}" />
+                                <Setter TargetName="PART_ContentHost"
+                                        Property="TextElement.Foreground"
+                                        Value="{DynamicResource SecondaryTextBrush}" />
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+            <Style.Triggers>
+                <Trigger Property="IsEnabled" Value="False">
+                    <Setter Property="Foreground" Value="{DynamicResource SecondaryTextBrush}" />
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+        <Style TargetType="{x:Type ComboBox}"
+               BasedOn="{StaticResource SettingsControlForegroundStyle}">
+            <Setter Property="Background" Value="{DynamicResource PanelBackgroundBrush}" />
+            <Setter Property="BorderBrush" Value="{DynamicResource BorderBrush}" />
+            <Setter Property="BorderThickness"
+                    Value="{x:Static presentation:LayoutMetrics.SeparatorBorder}" />
+            <Setter Property="Padding"
+                    Value="{x:Static presentation:LayoutMetrics.SettingsSpinnerTextPadding}" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type ComboBox}">
+                        <Grid x:Name="ComboBoxRoot"
+                              MinWidth="{TemplateBinding MinWidth}"
+                              MinHeight="{TemplateBinding MinHeight}">
+                            <Border x:Name="SelectionBorder"
+                                    BorderThickness="{TemplateBinding BorderThickness}"
+                                    BorderBrush="{TemplateBinding BorderBrush}"
+                                    Background="{TemplateBinding Background}" />
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="{x:Static presentation:LayoutMetrics.SettingsSpinnerButtonGridWidth}" />
+                                </Grid.ColumnDefinitions>
+                                <ContentPresenter x:Name="SelectionContent"
+                                                  Margin="{TemplateBinding Padding}"
+                                                  HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+                                                  VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
+                                                  Content="{TemplateBinding SelectionBoxItem}"
+                                                  ContentStringFormat="{TemplateBinding SelectionBoxItemStringFormat}"
+                                                  ContentTemplate="{TemplateBinding SelectionBoxItemTemplate}"
+                                                  ContentTemplateSelector="{TemplateBinding ItemTemplateSelector}"
+                                                  IsHitTestVisible="False"
+                                                  SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}"
+                                                  TextElement.Foreground="{TemplateBinding Foreground}" />
+                                <Viewbox Grid.Column="1"
+                                         Margin="{x:Static presentation:LayoutMetrics.SettingsSpinnerTextPadding}"
+                                         IsHitTestVisible="False">
+                                    <Path Data="M 0 0 L 4 4 L 8 0 Z"
+                                          Fill="{TemplateBinding Foreground}" />
+                                </Viewbox>
+                            </Grid>
+                            <ToggleButton x:Name="DropDownToggle"
+                                          Background="Transparent"
+                                          BorderThickness="0"
+                                          ClickMode="Press"
+                                          Focusable="False"
+                                          IsChecked="{Binding IsDropDownOpen, Mode=TwoWay, RelativeSource={RelativeSource TemplatedParent}}">
+                                <ToggleButton.Template>
+                                    <ControlTemplate TargetType="{x:Type ToggleButton}">
+                                        <Border Background="Transparent" />
+                                    </ControlTemplate>
+                                </ToggleButton.Template>
+                            </ToggleButton>
+                            <Popup x:Name="PART_Popup"
+                                   AllowsTransparency="True"
+                                   Focusable="False"
+                                   IsOpen="{TemplateBinding IsDropDownOpen}"
+                                   Placement="Bottom"
+                                   PlacementTarget="{Binding ElementName=DropDownToggle}"
+                                   PopupAnimation="Slide">
+                                <Border x:Name="DropDownBorder"
+                                        Width="{Binding ActualWidth, ElementName=ComboBoxRoot}"
+                                        MaxHeight="{TemplateBinding MaxDropDownHeight}"
+                                        BorderThickness="{TemplateBinding BorderThickness}"
+                                        BorderBrush="{DynamicResource BorderBrush}"
+                                        Background="{DynamicResource PanelBackgroundBrush}">
+                                    <ScrollViewer CanContentScroll="True"
+                                                  HorizontalScrollBarVisibility="Auto"
+                                                  VerticalScrollBarVisibility="Auto">
+                                        <ItemsPresenter KeyboardNavigation.DirectionalNavigation="Contained"
+                                                        SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}" />
+                                    </ScrollViewer>
+                                </Border>
+                            </Popup>
+                        </Grid>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsDropDownOpen" Value="True">
+                                <Setter TargetName="SelectionBorder"
+                                        Property="BorderBrush"
+                                        Value="{DynamicResource FocusBrush}" />
+                            </Trigger>
+                            <Trigger Property="IsKeyboardFocusWithin" Value="True">
+                                <Setter TargetName="SelectionBorder"
+                                        Property="BorderBrush"
+                                        Value="{DynamicResource FocusBrush}" />
+                            </Trigger>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="SelectionBorder"
+                                        Property="BorderBrush"
+                                        Value="{DynamicResource FocusBrush}" />
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+            <Style.Triggers>
+                <Trigger Property="IsEnabled" Value="False">
+                    <Setter Property="Foreground" Value="{DynamicResource SecondaryTextBrush}" />
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+        <Style TargetType="{x:Type ComboBoxItem}"
+               BasedOn="{StaticResource SettingsControlForegroundStyle}">
+            <Setter Property="Background" Value="{DynamicResource PanelBackgroundBrush}" />
+            <Setter Property="BorderBrush" Value="Transparent" />
+            <Setter Property="BorderThickness"
+                    Value="{x:Static presentation:LayoutMetrics.SeparatorBorder}" />
+            <Setter Property="Padding"
+                    Value="{x:Static presentation:LayoutMetrics.SettingsSpinnerTextPadding}" />
+            <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type ComboBoxItem}">
+                        <Border x:Name="ItemBorder"
+                                Padding="{TemplateBinding Padding}"
+                                BorderThickness="{TemplateBinding BorderThickness}"
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                Background="{TemplateBinding Background}">
+                            <ContentPresenter HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+                                              VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
+                                              ContentStringFormat="{TemplateBinding ContentStringFormat}"
+                                              ContentTemplate="{TemplateBinding ContentTemplate}"
+                                              ContentTemplateSelector="{TemplateBinding ContentTemplateSelector}"
+                                              RecognizesAccessKey="True"
+                                              SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}"
+                                              TextElement.Foreground="{TemplateBinding Foreground}" />
+                        </Border>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+            <Style.Triggers>
+                <Trigger Property="IsSelected" Value="True">
+                    <Setter Property="Background" Value="{DynamicResource FocusBrush}" />
+                    <Setter Property="Foreground" Value="{DynamicResource FocusForegroundBrush}" />
+                </Trigger>
+                <Trigger Property="IsHighlighted" Value="True">
+                    <Setter Property="Background" Value="{DynamicResource FocusBrush}" />
+                    <Setter Property="Foreground" Value="{DynamicResource FocusForegroundBrush}" />
+                </Trigger>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="Background" Value="{DynamicResource FocusBrush}" />
+                    <Setter Property="Foreground" Value="{DynamicResource FocusForegroundBrush}" />
+                </Trigger>
+                <Trigger Property="IsKeyboardFocusWithin" Value="True">
+                    <Setter Property="Background" Value="{DynamicResource FocusBrush}" />
+                    <Setter Property="Foreground" Value="{DynamicResource FocusForegroundBrush}" />
+                </Trigger>
+                <Trigger Property="IsEnabled" Value="False">
+                    <Setter Property="Background" Value="{DynamicResource PanelBackgroundBrush}" />
+                    <Setter Property="Foreground" Value="{DynamicResource SecondaryTextBrush}" />
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+        <Style TargetType="{x:Type ListBoxItem}"
+               BasedOn="{StaticResource SettingsControlForegroundStyle}">
+            <Setter Property="Background" Value="Transparent" />
+            <Setter Property="BorderBrush" Value="Transparent" />
+            <Setter Property="BorderThickness"
+                    Value="{x:Static presentation:LayoutMetrics.SeparatorBorder}" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type ListBoxItem}">
+                        <Border x:Name="ItemBorder"
+                                Padding="{TemplateBinding Padding}"
+                                BorderThickness="{TemplateBinding BorderThickness}"
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                Background="{TemplateBinding Background}">
+                            <ContentPresenter HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+                                              VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
+                                              ContentStringFormat="{TemplateBinding ContentStringFormat}"
+                                              ContentTemplate="{TemplateBinding ContentTemplate}"
+                                              ContentTemplateSelector="{TemplateBinding ContentTemplateSelector}"
+                                              RecognizesAccessKey="True"
+                                              SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}"
+                                              TextElement.Foreground="{TemplateBinding Foreground}" />
+                        </Border>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+            <Style.Triggers>
+                <Trigger Property="IsSelected" Value="True">
+                    <Setter Property="Background" Value="{DynamicResource FocusBrush}" />
+                    <Setter Property="Foreground" Value="{DynamicResource FocusForegroundBrush}" />
+                </Trigger>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="Background" Value="{DynamicResource FocusBrush}" />
+                    <Setter Property="Foreground" Value="{DynamicResource FocusForegroundBrush}" />
+                </Trigger>
+                <Trigger Property="IsKeyboardFocusWithin" Value="True">
+                    <Setter Property="Background" Value="{DynamicResource FocusBrush}" />
+                    <Setter Property="Foreground" Value="{DynamicResource FocusForegroundBrush}" />
+                </Trigger>
+                <Trigger Property="IsEnabled" Value="False">
+                    <Setter Property="Background" Value="Transparent" />
+                    <Setter Property="Foreground" Value="{DynamicResource SecondaryTextBrush}" />
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+        <Style TargetType="{x:Type CheckBox}"
+               BasedOn="{StaticResource SettingsControlForegroundStyle}">
+            <Setter Property="Background" Value="Transparent" />
+            <Setter Property="Padding"
+                    Value="{x:Static presentation:LayoutMetrics.SettingsPaletteSelectionPadding}" />
+            <Setter Property="HorizontalContentAlignment" Value="Left" />
+            <Setter Property="VerticalContentAlignment" Value="Center" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type CheckBox}">
+                        <Border x:Name="StateBorder"
+                                Padding="{TemplateBinding Padding}"
+                                BorderBrush="Transparent"
+                                Background="{TemplateBinding Background}"
+                                SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto" />
+                                    <ColumnDefinition Width="*" />
+                                </Grid.ColumnDefinitions>
+                                <Border x:Name="SelectionIndicator"
+                                        Margin="{x:Static presentation:LayoutMetrics.SettingsPaletteSelectionPadding}"
+                                        Padding="{x:Static presentation:LayoutMetrics.SettingsPaletteSelectionPadding}"
+                                        BorderThickness="{x:Static presentation:LayoutMetrics.SeparatorBorder}"
+                                        BorderBrush="{DynamicResource PrimaryTextBrush}"
+                                        Background="{DynamicResource ButtonBackgroundBrush}">
+                                    <Path x:Name="CheckMark"
+                                          Data="M 0 3 L 3 6 L 8 0"
+                                          Stroke="Transparent"
+                                          StrokeThickness="{x:Static presentation:LayoutMetrics.FocusBorderThickness}" />
+                                </Border>
+                                <ContentPresenter x:Name="StateContent"
+                                                  Grid.Column="1"
+                                                  HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+                                                  VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
+                                                  Content="{TemplateBinding Content}"
+                                                  ContentStringFormat="{TemplateBinding ContentStringFormat}"
+                                                  ContentTemplate="{TemplateBinding ContentTemplate}"
+                                                  ContentTemplateSelector="{TemplateBinding ContentTemplateSelector}"
+                                                  RecognizesAccessKey="True"
+                                                  SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}"
+                                                  TextElement.Foreground="{TemplateBinding Foreground}" />
+                            </Grid>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsChecked" Value="True">
+                                <Setter TargetName="SelectionIndicator"
+                                        Property="Background"
+                                        Value="{DynamicResource FocusBrush}" />
+                                <Setter TargetName="CheckMark"
+                                        Property="Stroke"
+                                        Value="{DynamicResource FocusForegroundBrush}" />
+                            </Trigger>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="StateBorder"
+                                        Property="Background"
+                                        Value="{DynamicResource FocusBrush}" />
+                                <Setter TargetName="SelectionIndicator"
+                                        Property="BorderBrush"
+                                        Value="{DynamicResource FocusForegroundBrush}" />
+                                <Setter TargetName="StateContent"
+                                        Property="TextElement.Foreground"
+                                        Value="{DynamicResource FocusForegroundBrush}" />
+                            </Trigger>
+                            <Trigger Property="IsPressed" Value="True">
+                                <Setter TargetName="StateBorder"
+                                        Property="Background"
+                                        Value="{DynamicResource FocusBrush}" />
+                                <Setter TargetName="SelectionIndicator"
+                                        Property="BorderBrush"
+                                        Value="{DynamicResource FocusForegroundBrush}" />
+                                <Setter TargetName="StateContent"
+                                        Property="TextElement.Foreground"
+                                        Value="{DynamicResource FocusForegroundBrush}" />
+                            </Trigger>
+                            <Trigger Property="IsKeyboardFocused" Value="True">
+                                <Setter TargetName="StateBorder"
+                                        Property="Background"
+                                        Value="{DynamicResource FocusBrush}" />
+                                <Setter TargetName="SelectionIndicator"
+                                        Property="BorderBrush"
+                                        Value="{DynamicResource FocusForegroundBrush}" />
+                                <Setter TargetName="StateContent"
+                                        Property="TextElement.Foreground"
+                                        Value="{DynamicResource FocusForegroundBrush}" />
+                            </Trigger>
+                            <Trigger Property="IsEnabled" Value="False">
+                                <Setter TargetName="StateBorder"
+                                        Property="Background"
+                                        Value="Transparent" />
+                                <Setter TargetName="SelectionIndicator"
+                                        Property="BorderBrush"
+                                        Value="{DynamicResource SecondaryTextBrush}" />
+                                <Setter TargetName="SelectionIndicator"
+                                        Property="Background"
+                                        Value="{DynamicResource ButtonBackgroundBrush}" />
+                                <Setter TargetName="StateContent"
+                                        Property="TextElement.Foreground"
+                                        Value="{DynamicResource SecondaryTextBrush}" />
+                            </Trigger>
+                            <MultiTrigger>
+                                <MultiTrigger.Conditions>
+                                    <Condition Property="IsChecked" Value="True" />
+                                    <Condition Property="IsEnabled" Value="False" />
+                                </MultiTrigger.Conditions>
+                                <Setter TargetName="CheckMark"
+                                        Property="Stroke"
+                                        Value="{DynamicResource SecondaryTextBrush}" />
+                            </MultiTrigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+            <Style.Triggers>
+                <Trigger Property="IsEnabled" Value="False">
+                    <Setter Property="Foreground" Value="{DynamicResource SecondaryTextBrush}" />
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+        <Style TargetType="{x:Type RadioButton}"
+               BasedOn="{StaticResource SettingsControlForegroundStyle}">
+            <Setter Property="Background" Value="Transparent" />
+            <Setter Property="Padding"
+                    Value="{x:Static presentation:LayoutMetrics.SettingsPaletteSelectionPadding}" />
+            <Setter Property="HorizontalContentAlignment" Value="Left" />
+            <Setter Property="VerticalContentAlignment" Value="Center" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type RadioButton}">
+                        <Border x:Name="StateBorder"
+                                Padding="{TemplateBinding Padding}"
+                                BorderBrush="Transparent"
+                                Background="{TemplateBinding Background}"
+                                SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto" />
+                                    <ColumnDefinition Width="*" />
+                                </Grid.ColumnDefinitions>
+                                <Grid Margin="{x:Static presentation:LayoutMetrics.SettingsPaletteSelectionPadding}">
+                                    <Path x:Name="SelectionIndicator"
+                                          Data="M 5 0 A 5 5 0 1 1 4.999 0 Z"
+                                          Fill="Transparent"
+                                          Stroke="{DynamicResource PrimaryTextBrush}"
+                                          StrokeThickness="{x:Static presentation:LayoutMetrics.FocusBorderThickness}" />
+                                    <Path x:Name="SelectionMark"
+                                          Data="M 5 2.5 A 2.5 2.5 0 1 1 4.999 2.5 Z"
+                                          Fill="Transparent" />
+                                </Grid>
+                                <ContentPresenter x:Name="StateContent"
+                                                  Grid.Column="1"
+                                                  HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+                                                  VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
+                                                  Content="{TemplateBinding Content}"
+                                                  ContentStringFormat="{TemplateBinding ContentStringFormat}"
+                                                  ContentTemplate="{TemplateBinding ContentTemplate}"
+                                                  ContentTemplateSelector="{TemplateBinding ContentTemplateSelector}"
+                                                  RecognizesAccessKey="True"
+                                                  SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}"
+                                                  TextElement.Foreground="{TemplateBinding Foreground}" />
+                            </Grid>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsChecked" Value="True">
+                                <Setter TargetName="SelectionIndicator"
+                                        Property="Stroke"
+                                        Value="{DynamicResource FocusBrush}" />
+                                <Setter TargetName="SelectionMark"
+                                        Property="Fill"
+                                        Value="{DynamicResource FocusBrush}" />
+                            </Trigger>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="StateBorder"
+                                        Property="Background"
+                                        Value="{DynamicResource FocusBrush}" />
+                                <Setter TargetName="SelectionIndicator"
+                                        Property="Stroke"
+                                        Value="{DynamicResource FocusForegroundBrush}" />
+                                <Setter TargetName="SelectionMark"
+                                        Property="Fill"
+                                        Value="{DynamicResource FocusForegroundBrush}" />
+                                <Setter TargetName="StateContent"
+                                        Property="TextElement.Foreground"
+                                        Value="{DynamicResource FocusForegroundBrush}" />
+                            </Trigger>
+                            <Trigger Property="IsPressed" Value="True">
+                                <Setter TargetName="StateBorder"
+                                        Property="Background"
+                                        Value="{DynamicResource FocusBrush}" />
+                                <Setter TargetName="SelectionIndicator"
+                                        Property="Stroke"
+                                        Value="{DynamicResource FocusForegroundBrush}" />
+                                <Setter TargetName="SelectionMark"
+                                        Property="Fill"
+                                        Value="{DynamicResource FocusForegroundBrush}" />
+                                <Setter TargetName="StateContent"
+                                        Property="TextElement.Foreground"
+                                        Value="{DynamicResource FocusForegroundBrush}" />
+                            </Trigger>
+                            <Trigger Property="IsKeyboardFocused" Value="True">
+                                <Setter TargetName="StateBorder"
+                                        Property="Background"
+                                        Value="{DynamicResource FocusBrush}" />
+                                <Setter TargetName="SelectionIndicator"
+                                        Property="Stroke"
+                                        Value="{DynamicResource FocusForegroundBrush}" />
+                                <Setter TargetName="SelectionMark"
+                                        Property="Fill"
+                                        Value="{DynamicResource FocusForegroundBrush}" />
+                                <Setter TargetName="StateContent"
+                                        Property="TextElement.Foreground"
+                                        Value="{DynamicResource FocusForegroundBrush}" />
+                            </Trigger>
+                            <Trigger Property="IsEnabled" Value="False">
+                                <Setter TargetName="StateBorder"
+                                        Property="Background"
+                                        Value="Transparent" />
+                                <Setter TargetName="SelectionIndicator"
+                                        Property="Stroke"
+                                        Value="{DynamicResource SecondaryTextBrush}" />
+                                <Setter TargetName="StateContent"
+                                        Property="TextElement.Foreground"
+                                        Value="{DynamicResource SecondaryTextBrush}" />
+                            </Trigger>
+                            <MultiTrigger>
+                                <MultiTrigger.Conditions>
+                                    <Condition Property="IsChecked" Value="True" />
+                                    <Condition Property="IsEnabled" Value="False" />
+                                </MultiTrigger.Conditions>
+                                <Setter TargetName="SelectionMark"
+                                        Property="Fill"
+                                        Value="{DynamicResource SecondaryTextBrush}" />
+                            </MultiTrigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+            <Style.Triggers>
+                <Trigger Property="IsEnabled" Value="False">
+                    <Setter Property="Foreground" Value="{DynamicResource SecondaryTextBrush}" />
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+        <Style TargetType="{x:Type GroupBox}"
+               BasedOn="{StaticResource SettingsControlForegroundStyle}" />
+        <DataTemplate DataType="{x:Type viewModels:AccountSettingsViewModel}">
+            <StackPanel>
+                <TextBlock Margin="{x:Static presentation:LayoutMetrics.SettingsLabelMargin}"
+                           FontWeight="SemiBold"
+                           Text="{Binding HeadingText}" />
+                <StackPanel Margin="{x:Static presentation:LayoutMetrics.SettingsFieldMargin}"
+                            Orientation="Horizontal">
+                    <Button Margin="{x:Static presentation:LayoutMetrics.SettingsInlineItemMargin}"
+                            Padding="{x:Static presentation:LayoutMetrics.SettingsButtonPadding}"
+                            Command="{Binding AddGoogleAccountCommand}"
+                            Content="{Binding AddGoogleText}"
+                            ToolTip="{Binding GoogleUnavailableToolTip}"
+                            ToolTipService.ShowOnDisabled="True" />
+                    <Button Padding="{x:Static presentation:LayoutMetrics.SettingsButtonPadding}"
+                            Command="{Binding AddMicrosoftAccountCommand}"
+                            Content="{Binding AddMicrosoftText}"
+                            ToolTip="{Binding MicrosoftUnavailableToolTip}"
+                            ToolTipService.ShowOnDisabled="True" />
+                </StackPanel>
+                <TextBlock Margin="{x:Static presentation:LayoutMetrics.SettingsFieldMargin}"
+                           Foreground="{DynamicResource SecondaryTextBrush}"
+                           Text="{Binding AuthenticationProgressText}"
+                           Visibility="{Binding AuthenticationProgressText, Converter={StaticResource ValueVisibility}}" />
+                <TextBlock Margin="{x:Static presentation:LayoutMetrics.SettingsFieldMargin}"
+                           Foreground="{DynamicResource ErrorBrush}"
+                           Text="{Binding OperationMessage}"
+                           TextWrapping="Wrap"
+                           Visibility="{Binding OperationMessage, Converter={StaticResource ValueVisibility}}" />
+                <TextBlock Margin="{x:Static presentation:LayoutMetrics.SettingsFieldMargin}"
+                           Foreground="{DynamicResource SecondaryTextBrush}"
+                           Text="{Binding EmptyText}"
+                           Visibility="{Binding IsEmpty, Converter={StaticResource BooleanVisibility}}" />
+                <ItemsControl ItemsSource="{Binding Accounts}"
+                              KeyboardNavigation.TabNavigation="Continue"
+                              VirtualizingPanel.IsVirtualizing="True"
+                              VirtualizingPanel.VirtualizationMode="Recycling">
+                    <ItemsControl.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <VirtualizingStackPanel />
+                        </ItemsPanelTemplate>
+                    </ItemsControl.ItemsPanel>
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate DataType="{x:Type viewModels:AccountListItemViewModel}">
+                            <Border Margin="{x:Static presentation:LayoutMetrics.SettingsLabelMargin}"
+                                    Padding="{x:Static presentation:LayoutMetrics.SettingsSpinnerTextPadding}"
+                                    BorderThickness="{x:Static presentation:LayoutMetrics.SeparatorBorder}"
+                                    BorderBrush="{DynamicResource BorderBrush}"
+                                    Background="{DynamicResource ButtonBackgroundBrush}">
+                                <Grid>
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="Auto" />
+                                        <RowDefinition Height="Auto" />
+                                        <RowDefinition Height="Auto" />
+                                        <RowDefinition Height="Auto" />
+                                    </Grid.RowDefinitions>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*" />
+                                        <ColumnDefinition Width="Auto" />
+                                    </Grid.ColumnDefinitions>
+                                    <StackPanel>
+                                        <TextBlock FontWeight="SemiBold"
+                                                   Text="{Binding DisplayIdentity}"
+                                                   TextTrimming="CharacterEllipsis"
+                                                   TextWrapping="NoWrap"
+                                                   ToolTip="{Binding DisplayIdentity}" />
+                                        <TextBlock Foreground="{DynamicResource SecondaryTextBrush}"
+                                                   Text="{Binding Email}"
+                                                   TextTrimming="CharacterEllipsis"
+                                                   TextWrapping="NoWrap"
+                                                   ToolTip="{Binding Email}" />
+                                    </StackPanel>
+                                    <TextBlock Grid.Column="1"
+                                               Margin="{x:Static presentation:LayoutMetrics.SettingsInfoValueMargin}"
+                                               FontWeight="SemiBold"
+                                               Text="{Binding ProviderText}" />
+                                    <StackPanel Grid.Row="1"
+                                                Grid.ColumnSpan="2"
+                                                Margin="{x:Static presentation:LayoutMetrics.SettingsLabelMargin}"
+                                                Orientation="Horizontal">
+                                        <TextBlock Margin="{x:Static presentation:LayoutMetrics.SettingsInlineItemMargin}"
+                                                   FontWeight="SemiBold"
+                                                   Text="{Binding EnabledStateText}" />
+                                         <TextBlock Margin="{x:Static presentation:LayoutMetrics.SettingsInlineItemMargin}"
+                                                    Text="{Binding SyncStatusText}" />
+                                         <TextBlock Margin="{x:Static presentation:LayoutMetrics.SettingsInlineItemMargin}"
+                                                    Foreground="{DynamicResource SecondaryTextBrush}"
+                                                    Text="{Binding SyncTargetReasonText}"
+                                                    Visibility="{Binding SyncTargetReasonText, Converter={StaticResource ValueVisibility}}" />
+                                         <TextBlock Foreground="{DynamicResource SecondaryTextBrush}"
+                                                    Text="{Binding LastSuccessfulSyncText}" />
+                                    </StackPanel>
+                                    <TextBlock Grid.Row="2"
+                                               Grid.ColumnSpan="2"
+                                               Margin="{x:Static presentation:LayoutMetrics.SettingsLabelMargin}"
+                                               Foreground="{DynamicResource ErrorBrush}"
+                                               Text="{Binding AuthenticationStateText}"
+                                               Visibility="{Binding HasAuthenticationError, Converter={StaticResource BooleanVisibility}}" />
+                                    <StackPanel Grid.Row="3"
+                                                Grid.ColumnSpan="2"
+                                                HorizontalAlignment="Right"
+                                                Orientation="Horizontal">
+                                        <TextBlock Margin="{x:Static presentation:LayoutMetrics.SettingsInlineItemMargin}"
+                                                   VerticalAlignment="Center"
+                                                   Foreground="{DynamicResource SecondaryTextBrush}"
+                                                   Text="{Binding BusyText}"
+                                                   Visibility="{Binding IsBusy, Converter={StaticResource BooleanVisibility}}" />
+                                        <Button Margin="{x:Static presentation:LayoutMetrics.SettingsInlineItemMargin}"
+                                                Padding="{x:Static presentation:LayoutMetrics.SettingsButtonPadding}"
+                                                Command="{Binding ReauthenticateCommand}"
+                                                Content="{Binding ReauthenticateText}"
+                                                ToolTip="{Binding ProviderUnavailableToolTip}"
+                                                ToolTipService.ShowOnDisabled="True" />
+                                        <Button Margin="{x:Static presentation:LayoutMetrics.SettingsInlineItemMargin}"
+                                                Padding="{x:Static presentation:LayoutMetrics.SettingsButtonPadding}"
+                                                Command="{Binding ToggleEnabledCommand}"
+                                                Content="{Binding EnabledText}" />
+                                        <Button Padding="{x:Static presentation:LayoutMetrics.SettingsButtonPadding}"
+                                                Command="{Binding DeleteCommand}"
+                                                Content="{Binding DeleteText}" />
+                                    </StackPanel>
+                                </Grid>
+                            </Border>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+            </StackPanel>
+        </DataTemplate>
+        <DataTemplate DataType="{x:Type viewModels:CalendarSelectionSettingsViewModel}">
+            <StackPanel>
+                <Grid Margin="{x:Static presentation:LayoutMetrics.SettingsFieldMargin}">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+                    <TextBlock VerticalAlignment="Center"
+                               FontWeight="SemiBold"
+                               Text="{Binding HeadingText}" />
+                    <Button Grid.Column="1"
+                            Padding="{x:Static presentation:LayoutMetrics.SettingsButtonPadding}"
+                            Command="{Binding RefreshCommand}"
+                            Content="{Binding RefreshText}" />
+                </Grid>
+                <TextBlock Margin="{x:Static presentation:LayoutMetrics.SettingsFieldMargin}"
+                           Foreground="{DynamicResource SecondaryTextBrush}"
+                           Text="{Binding LoadingText}"
+                           Visibility="{Binding IsLoading, Converter={StaticResource BooleanVisibility}}" />
+                <TextBlock Margin="{x:Static presentation:LayoutMetrics.SettingsFieldMargin}"
+                           Foreground="{DynamicResource ErrorBrush}"
+                           Text="{Binding OperationMessage}"
+                           TextWrapping="Wrap"
+                           Visibility="{Binding OperationMessage, Converter={StaticResource ValueVisibility}}" />
+                <TextBlock Margin="{x:Static presentation:LayoutMetrics.SettingsFieldMargin}"
+                           Foreground="{DynamicResource SecondaryTextBrush}"
+                           Text="{Binding EmptyText}"
+                           Visibility="{Binding IsEmpty, Converter={StaticResource BooleanVisibility}}" />
+                <ItemsControl ItemsSource="{Binding AccountGroups}"
+                              KeyboardNavigation.TabNavigation="Continue"
+                              VirtualizingPanel.IsVirtualizing="True"
+                              VirtualizingPanel.VirtualizationMode="Recycling">
+                    <ItemsControl.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <VirtualizingStackPanel />
+                        </ItemsPanelTemplate>
+                    </ItemsControl.ItemsPanel>
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate DataType="{x:Type viewModels:CalendarAccountGroupViewModel}">
+                            <Border Margin="{x:Static presentation:LayoutMetrics.SettingsFieldMargin}"
+                                    Padding="{x:Static presentation:LayoutMetrics.SettingsSpinnerTextPadding}"
+                                    BorderThickness="{x:Static presentation:LayoutMetrics.SeparatorBorder}"
+                                    BorderBrush="{DynamicResource BorderBrush}"
+                                    Background="{DynamicResource PanelBackgroundBrush}">
+                                <StackPanel>
+                                    <StackPanel Margin="{x:Static presentation:LayoutMetrics.SettingsLabelMargin}"
+                                                Orientation="Horizontal">
+                                        <TextBlock Margin="{x:Static presentation:LayoutMetrics.SettingsInlineItemMargin}"
+                                                   FontWeight="SemiBold"
+                                                   Text="{Binding AccountDisplayIdentity}"
+                                                   TextTrimming="CharacterEllipsis"
+                                                   TextWrapping="NoWrap"
+                                                   ToolTip="{Binding AccountDisplayIdentity}" />
+                                        <TextBlock Foreground="{DynamicResource SecondaryTextBrush}"
+                                                   Text="{Binding ProviderText}" />
+                                    </StackPanel>
+                                    <TextBlock Margin="{x:Static presentation:LayoutMetrics.SettingsLabelMargin}"
+                                               Foreground="{DynamicResource ErrorBrush}"
+                                               Text="{Binding DiscoveryErrorText}"
+                                               TextWrapping="Wrap"
+                                               Visibility="{Binding HasDiscoveryError, Converter={StaticResource BooleanVisibility}}" />
+                                    <TextBlock Margin="{x:Static presentation:LayoutMetrics.SettingsLabelMargin}"
+                                               Foreground="{DynamicResource SecondaryTextBrush}"
+                                               Text="{Binding AllOffText}"
+                                               TextWrapping="Wrap"
+                                               Visibility="{Binding IsAllOff, Converter={StaticResource BooleanVisibility}}" />
+                                    <TextBlock Margin="{x:Static presentation:LayoutMetrics.SettingsLabelMargin}"
+                                               Foreground="{DynamicResource SecondaryTextBrush}"
+                                               Text="{Binding SharedCalendarGuidanceText}"
+                                               TextWrapping="Wrap"
+                                               Visibility="{Binding ShowSharedCalendarGuidance, Converter={StaticResource BooleanVisibility}}" />
+                                    <ItemsControl ItemsSource="{Binding Calendars}"
+                                                  KeyboardNavigation.TabNavigation="Continue"
+                                                  VirtualizingPanel.IsVirtualizing="True"
+                                                  VirtualizingPanel.VirtualizationMode="Recycling">
+                                        <ItemsControl.ItemsPanel>
+                                            <ItemsPanelTemplate>
+                                                <VirtualizingStackPanel />
+                                            </ItemsPanelTemplate>
+                                        </ItemsControl.ItemsPanel>
+                                        <ItemsControl.ItemTemplate>
+                                            <DataTemplate DataType="{x:Type viewModels:CalendarListItemViewModel}">
+                                                <Border Margin="{x:Static presentation:LayoutMetrics.SettingsLabelMargin}"
+                                                        Padding="{x:Static presentation:LayoutMetrics.SettingsSpinnerTextPadding}"
+                                                        BorderThickness="{x:Static presentation:LayoutMetrics.SeparatorBorder}"
+                                                        BorderBrush="{DynamicResource BorderBrush}"
+                                                        Background="{DynamicResource ButtonBackgroundBrush}">
+                                                    <Grid>
+                                                        <Grid.RowDefinitions>
+                                                            <RowDefinition Height="Auto" />
+                                                            <RowDefinition Height="Auto" />
+                                                        </Grid.RowDefinitions>
+                                                        <Grid.ColumnDefinitions>
+                                                            <ColumnDefinition Width="Auto" />
+                                                            <ColumnDefinition Width="*" />
+                                                            <ColumnDefinition Width="Auto" />
+                                                        </Grid.ColumnDefinitions>
+                                                        <Border Width="{x:Static presentation:LayoutMetrics.SettingsColorSwatchSize}"
+                                                                Height="{x:Static presentation:LayoutMetrics.SettingsColorSwatchSize}"
+                                                                Margin="{x:Static presentation:LayoutMetrics.SettingsInlineItemMargin}"
+                                                                VerticalAlignment="Center"
+                                                                BorderThickness="{x:Static presentation:LayoutMetrics.SeparatorBorder}"
+                                                                BorderBrush="{DynamicResource BorderBrush}"
+                                                                Background="{Binding SourceColorBrush}" />
+                                                        <StackPanel Grid.Column="1">
+                                                            <TextBlock FontWeight="SemiBold"
+                                                                       Text="{Binding Name}"
+                                                                       TextTrimming="CharacterEllipsis"
+                                                                       TextWrapping="NoWrap"
+                                                                       ToolTip="{Binding Name}" />
+                                                            <StackPanel Orientation="Horizontal">
+                                                                <TextBlock Margin="{x:Static presentation:LayoutMetrics.SettingsInlineItemMargin}"
+                                                                           Foreground="{DynamicResource SecondaryTextBrush}"
+                                                                           Text="{Binding AccountDisplayIdentity}"
+                                                                           TextTrimming="CharacterEllipsis"
+                                                                           TextWrapping="NoWrap"
+                                                                           ToolTip="{Binding AccountDisplayIdentity}" />
+                                                                <TextBlock Foreground="{DynamicResource SecondaryTextBrush}"
+                                                                           Text="{Binding ProviderText}" />
+                                                            </StackPanel>
+                                                        </StackPanel>
+                                                        <CheckBox Grid.Column="2"
+                                                                  VerticalAlignment="Center"
+                                                                  Command="{Binding ToggleVisibilityCommand}"
+                                                                  Content="{Binding ToggleText}"
+                                                                  IsChecked="{Binding IsVisible, Mode=OneWay}"
+                                                                  ToolTip="{Binding ToggleToolTip}"
+                                                                  ToolTipService.ShowOnDisabled="True" />
+                                                        <StackPanel Grid.Row="1"
+                                                                    Grid.Column="1"
+                                                                    Grid.ColumnSpan="2">
+                                                            <TextBlock Foreground="{DynamicResource SecondaryTextBrush}"
+                                                                       Text="{Binding ReadUnavailableText}"
+                                                                       TextWrapping="Wrap"
+                                                                       Visibility="{Binding ShowReadUnavailableReason, Converter={StaticResource BooleanVisibility}}" />
+                                                            <TextBlock Foreground="{DynamicResource ErrorBrush}"
+                                                                       Text="{Binding SyncWarningText}"
+                                                                       ToolTip="{Binding SyncWarningToolTip}"
+                                                                       Visibility="{Binding HasSyncWarning, Converter={StaticResource BooleanVisibility}}" />
+                                                            <TextBlock Foreground="{DynamicResource SecondaryTextBrush}"
+                                                                       Text="{Binding BusyText}"
+                                                                       Visibility="{Binding IsBusy, Converter={StaticResource BooleanVisibility}}" />
+                                                        </StackPanel>
+                                                    </Grid>
+                                                </Border>
+                                            </DataTemplate>
+                                        </ItemsControl.ItemTemplate>
+                                    </ItemsControl>
+                                </StackPanel>
+                            </Border>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+                <Button HorizontalAlignment="Left"
+                        Padding="{x:Static presentation:LayoutMetrics.SettingsButtonPadding}"
+                        Command="{Binding BackCommand}"
+                        Content="{Binding BackText}"
+                        Visibility="{Binding IsPostRegistrationFlow, Converter={StaticResource BooleanVisibility}}" />
+            </StackPanel>
+        </DataTemplate>
+        <DataTemplate DataType="{x:Type viewModels:SettingsPlaceholderViewModel}">
+            <TextBlock Foreground="{DynamicResource SecondaryTextBrush}"
+                       Text="{Binding Text}"
+                       TextWrapping="Wrap" />
+        </DataTemplate>
+        <DataTemplate DataType="{x:Type viewModels:DisplaySettingsViewModel}">
+            <StackPanel>
+                <StackPanel Margin="{x:Static presentation:LayoutMetrics.SettingsFieldMargin}">
+                    <TextBlock Margin="{x:Static presentation:LayoutMetrics.SettingsLabelMargin}"
+                               Text="{Binding DaysText}" />
+                    <controls:IntegerSpinner Width="{x:Static presentation:LayoutMetrics.SettingsSpinnerWidth}"
+                                             HorizontalAlignment="Left"
+                                             Minimum="{x:Static persistence:DisplayPreferences.MinimumDays}"
+                                             Maximum="{x:Static persistence:DisplayPreferences.MaximumDays}"
+                                             Value="{Binding Days, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                </StackPanel>
+                <StackPanel Margin="{x:Static presentation:LayoutMetrics.SettingsFieldMargin}">
+                    <TextBlock Margin="{x:Static presentation:LayoutMetrics.SettingsLabelMargin}"
+                               Text="{Binding FontSizeText}" />
+                    <controls:IntegerSpinner Width="{x:Static presentation:LayoutMetrics.SettingsSpinnerWidth}"
+                                             HorizontalAlignment="Left"
+                                             Minimum="{x:Static persistence:DisplayPreferences.MinimumFontSizeDip}"
+                                             Maximum="{x:Static persistence:DisplayPreferences.MaximumFontSizeDip}"
+                                             Value="{Binding FontSizeDip, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                </StackPanel>
+                <StackPanel Margin="{x:Static presentation:LayoutMetrics.SettingsFieldMargin}">
+                    <TextBlock Margin="{x:Static presentation:LayoutMetrics.SettingsLabelMargin}"
+                               Text="{Binding DensityText}" />
+                    <StackPanel Orientation="Horizontal">
+                        <RadioButton Margin="{x:Static presentation:LayoutMetrics.SettingsInlineItemMargin}"
+                                     IsChecked="{Binding IsCompact, Mode=TwoWay}"
+                                     Content="{Binding CompactText}" />
+                        <RadioButton Margin="{x:Static presentation:LayoutMetrics.SettingsInlineItemMargin}"
+                                     IsChecked="{Binding IsStandard, Mode=TwoWay}"
+                                     Content="{Binding StandardText}" />
+                        <RadioButton IsChecked="{Binding IsComfortable, Mode=TwoWay}"
+                                     Content="{Binding ComfortableText}" />
+                    </StackPanel>
+                </StackPanel>
+                <StackPanel>
+                    <TextBlock Margin="{x:Static presentation:LayoutMetrics.SettingsLabelMargin}"
+                               Text="{Binding DefaultColorText}" />
+                    <ListBox HorizontalAlignment="Left"
+                             ItemsSource="{Binding ColorOptions}"
+                             SelectedItem="{Binding SelectedColorOption, Mode=TwoWay}"
+                             BorderThickness="0"
+                             Background="Transparent"
+                             ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+                             ScrollViewer.VerticalScrollBarVisibility="Disabled">
+                        <ListBox.Template>
+                            <ControlTemplate TargetType="{x:Type ListBox}">
+                                <ItemsPresenter />
+                            </ControlTemplate>
+                        </ListBox.Template>
+                        <ListBox.ItemContainerStyle>
+                            <Style TargetType="{x:Type ListBoxItem}"
+                                   BasedOn="{StaticResource {x:Type ListBoxItem}}">
+                                <Setter Property="Margin"
+                                        Value="{x:Static presentation:LayoutMetrics.SettingsPaletteItemMargin}" />
+                                <Setter Property="Padding"
+                                        Value="{x:Static presentation:LayoutMetrics.SettingsPaletteSelectionPadding}" />
+                                <Setter Property="HorizontalContentAlignment" Value="Center" />
+                                <Setter Property="VerticalContentAlignment" Value="Center" />
+                                <Setter Property="BorderThickness"
+                                        Value="{x:Static presentation:LayoutMetrics.FocusBorder}" />
+                                <Setter Property="BorderBrush" Value="Transparent" />
+                                <Setter Property="Template">
+                                    <Setter.Value>
+                                        <ControlTemplate TargetType="{x:Type ListBoxItem}">
+                                            <Border Padding="{TemplateBinding Padding}"
+                                                    BorderThickness="{TemplateBinding BorderThickness}"
+                                                    BorderBrush="{TemplateBinding BorderBrush}"
+                                                    Background="{TemplateBinding Background}">
+                                                <ContentPresenter HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+                                                                  VerticalAlignment="{TemplateBinding VerticalContentAlignment}" />
+                                            </Border>
+                                        </ControlTemplate>
+                                    </Setter.Value>
+                                </Setter>
+                                <Style.Triggers>
+                                    <Trigger Property="IsSelected" Value="True">
+                                        <Setter Property="BorderBrush" Value="{DynamicResource FocusBrush}" />
+                                    </Trigger>
+                                </Style.Triggers>
+                            </Style>
+                        </ListBox.ItemContainerStyle>
+                        <ListBox.ItemsPanel>
+                            <ItemsPanelTemplate>
+                                <StackPanel Orientation="Horizontal" />
+                            </ItemsPanelTemplate>
+                        </ListBox.ItemsPanel>
+                        <ListBox.ItemTemplate>
+                            <DataTemplate>
+                                <Border Width="{x:Static presentation:LayoutMetrics.SettingsColorSwatchSize}"
+                                        Height="{x:Static presentation:LayoutMetrics.SettingsColorSwatchSize}"
+                                        AutomationProperties.Name="{Binding Name}"
+                                        BorderThickness="{x:Static presentation:LayoutMetrics.SeparatorBorder}"
+                                        BorderBrush="{DynamicResource BorderBrush}"
+                                        Background="{Binding Brush}"
+                                        ToolTip="{Binding Name}" />
+                            </DataTemplate>
+                        </ListBox.ItemTemplate>
+                    </ListBox>
+                    <StackPanel Margin="{x:Static presentation:LayoutMetrics.SettingsLabelMargin}"
+                                Orientation="Horizontal">
+                        <Border Width="{x:Static presentation:LayoutMetrics.SettingsColorSwatchSize}"
+                                Height="{x:Static presentation:LayoutMetrics.SettingsColorSwatchSize}"
+                                Margin="{x:Static presentation:LayoutMetrics.SettingsInlineItemMargin}"
+                                BorderThickness="{x:Static presentation:LayoutMetrics.SeparatorBorder}"
+                                BorderBrush="{DynamicResource BorderBrush}"
+                                Background="{Binding CurrentColorBrush}" />
+                        <TextBlock VerticalAlignment="Center" Text="{Binding CurrentColorText}" />
+                    </StackPanel>
+                    <Button HorizontalAlignment="Left"
+                            Padding="{x:Static presentation:LayoutMetrics.SettingsButtonPadding}"
+                            Click="PickCustomColorClick"
+                            Content="{Binding CustomColorText}" />
+                </StackPanel>
+            </StackPanel>
+        </DataTemplate>
+        <DataTemplate DataType="{x:Type viewModels:ColorRulesSettingsViewModel}">
+            <Grid>
+                <StackPanel x:Name="ColorRuleListPanel">
+                    <TextBlock Margin="{x:Static presentation:LayoutMetrics.SettingsLabelMargin}"
+                               FontWeight="SemiBold"
+                               Text="{Binding HeadingText}" />
+                    <TextBlock Margin="{x:Static presentation:LayoutMetrics.SettingsFieldMargin}"
+                               Foreground="{DynamicResource SecondaryTextBrush}"
+                               Text="{Binding EmptyText}"
+                               Visibility="{Binding IsEmpty, Converter={StaticResource BooleanVisibility}}" />
+                    <ItemsControl Margin="{x:Static presentation:LayoutMetrics.SettingsFieldMargin}"
+                                  ItemsSource="{Binding Rules}">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <Border Margin="{x:Static presentation:LayoutMetrics.SettingsLabelMargin}"
+                                        Padding="{x:Static presentation:LayoutMetrics.SettingsSpinnerTextPadding}"
+                                        AllowDrop="True"
+                                        BorderThickness="{x:Static presentation:LayoutMetrics.SeparatorBorder}"
+                                        BorderBrush="{DynamicResource BorderBrush}"
+                                        Background="{DynamicResource ButtonBackgroundBrush}"
+                                        DragOver="ColorRuleRowDragOver"
+                                        Drop="ColorRuleRowDrop"
+                                        MouseMove="ColorRuleRowMouseMove"
+                                        PreviewMouseLeftButtonDown="ColorRuleRowPreviewMouseLeftButtonDown">
+                                    <Grid>
+                                        <Grid.RowDefinitions>
+                                            <RowDefinition Height="Auto" />
+                                            <RowDefinition Height="Auto" />
+                                        </Grid.RowDefinitions>
+                                        <Grid x:Name="RuleIdentityPanel">
+                                            <Grid.Style>
+                                                <Style TargetType="{x:Type Grid}">
+                                                    <Style.Triggers>
+                                                        <DataTrigger Binding="{Binding IsEnabled}" Value="False">
+                                                            <Setter Property="Opacity"
+                                                                    Value="{x:Static presentation:ColorMetrics.DisabledRuleOpacity}" />
+                                                        </DataTrigger>
+                                                    </Style.Triggers>
+                                                </Style>
+                                            </Grid.Style>
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="Auto" />
+                                                <ColumnDefinition Width="*" />
+                                                <ColumnDefinition Width="Auto" />
+                                            </Grid.ColumnDefinitions>
+                                            <CheckBox Margin="{x:Static presentation:LayoutMetrics.SettingsInlineItemMargin}"
+                                                      VerticalAlignment="Center"
+                                                      AutomationProperties.Name="{Binding ToggleEnabledText}"
+                                                      Command="{Binding DataContext.ToggleRuleCommand, RelativeSource={RelativeSource AncestorType={x:Type ItemsControl}}}"
+                                                      CommandParameter="{Binding}"
+                                                      Content="{Binding EnabledText}"
+                                                      IsChecked="{Binding IsEnabled, Mode=OneWay}"
+                                                      ToolTip="{Binding ToggleEnabledText}" />
+                                            <StackPanel Grid.Column="1"
+                                                        Margin="{x:Static presentation:LayoutMetrics.SettingsInlineItemMargin}">
+                                                <TextBlock VerticalAlignment="Center"
+                                                           FontWeight="SemiBold"
+                                                           Text="{Binding Name}"
+                                                           TextTrimming="CharacterEllipsis"
+                                                           TextWrapping="NoWrap"
+                                                           ToolTip="{Binding Name}" />
+                                                <TextBlock VerticalAlignment="Center"
+                                                           Foreground="{DynamicResource SecondaryTextBrush}"
+                                                           Text="{Binding ConditionSummary}"
+                                                           TextTrimming="CharacterEllipsis"
+                                                           TextWrapping="NoWrap"
+                                                           ToolTip="{Binding ConditionSummary}" />
+                                            </StackPanel>
+                                            <Border Grid.Column="2"
+                                                    Width="{x:Static presentation:LayoutMetrics.SettingsColorSwatchSize}"
+                                                    Height="{x:Static presentation:LayoutMetrics.SettingsColorSwatchSize}"
+                                                    BorderThickness="{x:Static presentation:LayoutMetrics.SeparatorBorder}"
+                                                    BorderBrush="{DynamicResource BorderBrush}"
+                                                    Background="{Binding ColorBrush}" />
+                                        </Grid>
+                                        <StackPanel Grid.Row="1"
+                                                    HorizontalAlignment="Right"
+                                                    Orientation="Horizontal">
+                                            <Button Margin="{x:Static presentation:LayoutMetrics.SettingsInlineItemMargin}"
+                                                    Padding="{x:Static presentation:LayoutMetrics.SettingsButtonPadding}"
+                                                    AutomationProperties.Name="{Binding DataContext.MoveUpText, RelativeSource={RelativeSource AncestorType={x:Type ItemsControl}}}"
+                                                    Command="{Binding DataContext.MoveRuleUpCommand, RelativeSource={RelativeSource AncestorType={x:Type ItemsControl}}}"
+                                                    CommandParameter="{Binding}"
+                                                    Content="&#xE70E;"
+                                                    FontFamily="Segoe MDL2 Assets"
+                                                    ToolTip="{Binding DataContext.MoveUpText, RelativeSource={RelativeSource AncestorType={x:Type ItemsControl}}}" />
+                                            <Button Margin="{x:Static presentation:LayoutMetrics.SettingsInlineItemMargin}"
+                                                    Padding="{x:Static presentation:LayoutMetrics.SettingsButtonPadding}"
+                                                    AutomationProperties.Name="{Binding DataContext.MoveDownText, RelativeSource={RelativeSource AncestorType={x:Type ItemsControl}}}"
+                                                    Command="{Binding DataContext.MoveRuleDownCommand, RelativeSource={RelativeSource AncestorType={x:Type ItemsControl}}}"
+                                                    CommandParameter="{Binding}"
+                                                    Content="&#xE70D;"
+                                                    FontFamily="Segoe MDL2 Assets"
+                                                    ToolTip="{Binding DataContext.MoveDownText, RelativeSource={RelativeSource AncestorType={x:Type ItemsControl}}}" />
+                                            <Button Margin="{x:Static presentation:LayoutMetrics.SettingsInlineItemMargin}"
+                                                    Padding="{x:Static presentation:LayoutMetrics.SettingsButtonPadding}"
+                                                    AutomationProperties.Name="{Binding DataContext.EditText, RelativeSource={RelativeSource AncestorType={x:Type ItemsControl}}}"
+                                                    Command="{Binding DataContext.EditRuleCommand, RelativeSource={RelativeSource AncestorType={x:Type ItemsControl}}}"
+                                                    CommandParameter="{Binding}"
+                                                    Content="&#xE70F;"
+                                                    FontFamily="Segoe MDL2 Assets"
+                                                    ToolTip="{Binding DataContext.EditText, RelativeSource={RelativeSource AncestorType={x:Type ItemsControl}}}" />
+                                            <Button Padding="{x:Static presentation:LayoutMetrics.SettingsButtonPadding}"
+                                                    AutomationProperties.Name="{Binding DataContext.DeleteText, RelativeSource={RelativeSource AncestorType={x:Type ItemsControl}}}"
+                                                    Command="{Binding DataContext.DeleteRuleCommand, RelativeSource={RelativeSource AncestorType={x:Type ItemsControl}}}"
+                                                    CommandParameter="{Binding}"
+                                                    Content="&#xE74D;"
+                                                    FontFamily="Segoe MDL2 Assets"
+                                                    ToolTip="{Binding DataContext.DeleteText, RelativeSource={RelativeSource AncestorType={x:Type ItemsControl}}}" />
+                                        </StackPanel>
+                                    </Grid>
+                                </Border>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                    <Button HorizontalAlignment="Left"
+                            Padding="{x:Static presentation:LayoutMetrics.SettingsButtonPadding}"
+                            AutomationProperties.Name="{Binding AddText}"
+                            Command="{Binding AddRuleCommand}"
+                            ToolTip="{Binding AddText}">
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Margin="{x:Static presentation:LayoutMetrics.SettingsInlineItemMargin}"
+                                       FontFamily="Segoe MDL2 Assets"
+                                       Text="&#xE710;" />
+                            <TextBlock Text="{Binding AddText}" />
+                        </StackPanel>
+                    </Button>
+                </StackPanel>
+
+                <StackPanel x:Name="ColorRuleEditorPanel" Visibility="Collapsed">
+                    <TextBlock Margin="{x:Static presentation:LayoutMetrics.SettingsFieldMargin}"
+                               FontWeight="SemiBold"
+                               Text="{Binding EditorTitle}" />
+
+                    <StackPanel Margin="{x:Static presentation:LayoutMetrics.SettingsFieldMargin}">
+                        <TextBlock Margin="{x:Static presentation:LayoutMetrics.SettingsLabelMargin}"
+                                   Text="{Binding NameText}" />
+                        <TextBox Text="{Binding RuleName, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                        <TextBlock Margin="{x:Static presentation:LayoutMetrics.SettingsLabelMargin}"
+                                   Foreground="{DynamicResource ErrorBrush}"
+                                   Text="{Binding RuleNameError}"
+                                   TextWrapping="Wrap"
+                                   Visibility="{Binding RuleNameError, Converter={StaticResource ValueVisibility}}" />
+                    </StackPanel>
+
+                    <CheckBox Margin="{x:Static presentation:LayoutMetrics.SettingsFieldMargin}"
+                              IsChecked="{Binding IsRuleEnabled, Mode=TwoWay}"
+                              Content="{Binding EnabledText}" />
+
+                    <StackPanel Margin="{x:Static presentation:LayoutMetrics.SettingsFieldMargin}">
+                        <TextBlock Margin="{x:Static presentation:LayoutMetrics.SettingsLabelMargin}"
+                                   Text="{Binding OperatorText}" />
+                        <ComboBox Width="{x:Static presentation:LayoutMetrics.SettingsPaletteWidth}"
+                                  HorizontalAlignment="Left"
+                                  ItemsSource="{Binding OperatorOptions}"
+                                  DisplayMemberPath="Label"
+                                  SelectedItem="{Binding SelectedOperatorOption, Mode=TwoWay}" />
+                    </StackPanel>
+
+                    <StackPanel Margin="{x:Static presentation:LayoutMetrics.SettingsFieldMargin}">
+                        <TextBlock Margin="{x:Static presentation:LayoutMetrics.SettingsLabelMargin}"
+                                   FontWeight="SemiBold"
+                                   Text="{Binding ConditionsText}" />
+                        <ItemsControl ItemsSource="{Binding Conditions}">
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <Border Margin="{x:Static presentation:LayoutMetrics.SettingsLabelMargin}"
+                                            Padding="{x:Static presentation:LayoutMetrics.SettingsSpinnerTextPadding}"
+                                            BorderThickness="{x:Static presentation:LayoutMetrics.SeparatorBorder}"
+                                            BorderBrush="{DynamicResource BorderBrush}"
+                                            Background="{DynamicResource WindowBackgroundBrush}">
+                                        <StackPanel>
+                                            <ComboBox Width="{x:Static presentation:LayoutMetrics.SettingsPaletteWidth}"
+                                                      HorizontalAlignment="Left"
+                                                      ItemsSource="{Binding FieldOptions}"
+                                                      DisplayMemberPath="Label"
+                                                      SelectedItem="{Binding SelectedFieldOption, Mode=TwoWay}" />
+
+                                            <StackPanel Margin="{x:Static presentation:LayoutMetrics.SettingsLabelMargin}"
+                                                        Visibility="{Binding IsTextCondition, Converter={StaticResource BooleanVisibility}}">
+                                                <ComboBox Width="{x:Static presentation:LayoutMetrics.SettingsPaletteWidth}"
+                                                          Margin="{x:Static presentation:LayoutMetrics.SettingsLabelMargin}"
+                                                          HorizontalAlignment="Left"
+                                                          ItemsSource="{Binding MatchKindOptions}"
+                                                          DisplayMemberPath="Label"
+                                                          SelectedItem="{Binding SelectedMatchKindOption, Mode=TwoWay}" />
+
+                                                <StackPanel Visibility="{Binding IsCalendarNameCondition, Converter={StaticResource BooleanVisibility}}">
+                                                    <TextBlock Margin="{x:Static presentation:LayoutMetrics.SettingsLabelMargin}"
+                                                               Text="{Binding CalendarCandidateText}" />
+                                                    <ComboBox Width="{x:Static presentation:LayoutMetrics.SettingsPaletteWidth}"
+                                                              Margin="{x:Static presentation:LayoutMetrics.SettingsLabelMargin}"
+                                                              HorizontalAlignment="Left"
+                                                              ItemsSource="{Binding CalendarNameSuggestions}"
+                                                              SelectedItem="{Binding ComparisonValue, Mode=TwoWay}" />
+                                                </StackPanel>
+
+                                                <TextBlock Margin="{x:Static presentation:LayoutMetrics.SettingsLabelMargin}"
+                                                           Text="{Binding ComparisonValueText}" />
+                                                <TextBox Text="{Binding ComparisonValue, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                                                <TextBlock Margin="{x:Static presentation:LayoutMetrics.SettingsLabelMargin}"
+                                                           Foreground="{DynamicResource ErrorBrush}"
+                                                           Text="{Binding ComparisonValueError}"
+                                                           TextWrapping="Wrap"
+                                                           Visibility="{Binding ComparisonValueError, Converter={StaticResource ValueVisibility}}" />
+                                            </StackPanel>
+
+                                            <ComboBox Width="{x:Static presentation:LayoutMetrics.SettingsPaletteWidth}"
+                                                      Margin="{x:Static presentation:LayoutMetrics.SettingsLabelMargin}"
+                                                      HorizontalAlignment="Left"
+                                                      ItemsSource="{Binding ProviderOptions}"
+                                                      DisplayMemberPath="Label"
+                                                      SelectedItem="{Binding SelectedProviderOption, Mode=TwoWay}"
+                                                      Visibility="{Binding IsProviderCondition, Converter={StaticResource BooleanVisibility}}" />
+
+                                            <Button Margin="{x:Static presentation:LayoutMetrics.SettingsLabelMargin}"
+                                                    HorizontalAlignment="Left"
+                                                    Padding="{x:Static presentation:LayoutMetrics.SettingsButtonPadding}"
+                                                    Command="{Binding RemoveCommand}"
+                                                    Content="{Binding RemoveText}" />
+                                        </StackPanel>
+                                    </Border>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                        <TextBlock Margin="{x:Static presentation:LayoutMetrics.SettingsLabelMargin}"
+                                   Foreground="{DynamicResource ErrorBrush}"
+                                   Text="{Binding ConditionCountError}"
+                                   TextWrapping="Wrap"
+                                   Visibility="{Binding ConditionCountError, Converter={StaticResource ValueVisibility}}" />
+                        <Button HorizontalAlignment="Left"
+                                Padding="{x:Static presentation:LayoutMetrics.SettingsButtonPadding}"
+                                Command="{Binding AddConditionCommand}"
+                                Content="{Binding AddConditionText}" />
+                    </StackPanel>
+
+                    <StackPanel Margin="{x:Static presentation:LayoutMetrics.SettingsFieldMargin}">
+                        <TextBlock Margin="{x:Static presentation:LayoutMetrics.SettingsLabelMargin}"
+                                   FontWeight="SemiBold"
+                                   Text="{Binding ColorText}" />
+                        <ListBox HorizontalAlignment="Left"
+                                 ItemsSource="{Binding ColorOptions}"
+                                 SelectedItem="{Binding SelectedColorOption, Mode=TwoWay}"
+                                 BorderThickness="0"
+                                 Background="Transparent"
+                                 ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+                                 ScrollViewer.VerticalScrollBarVisibility="Disabled">
+                            <ListBox.Template>
+                                <ControlTemplate TargetType="{x:Type ListBox}">
+                                    <ItemsPresenter />
+                                </ControlTemplate>
+                            </ListBox.Template>
+                            <ListBox.ItemContainerStyle>
+                                <Style TargetType="{x:Type ListBoxItem}"
+                                       BasedOn="{StaticResource {x:Type ListBoxItem}}">
+                                    <Setter Property="Margin"
+                                            Value="{x:Static presentation:LayoutMetrics.SettingsPaletteItemMargin}" />
+                                    <Setter Property="Padding"
+                                            Value="{x:Static presentation:LayoutMetrics.SettingsPaletteSelectionPadding}" />
+                                    <Setter Property="HorizontalContentAlignment" Value="Center" />
+                                    <Setter Property="VerticalContentAlignment" Value="Center" />
+                                    <Setter Property="BorderThickness"
+                                            Value="{x:Static presentation:LayoutMetrics.FocusBorder}" />
+                                    <Setter Property="BorderBrush" Value="Transparent" />
+                                    <Setter Property="Template">
+                                        <Setter.Value>
+                                            <ControlTemplate TargetType="{x:Type ListBoxItem}">
+                                                <Border Padding="{TemplateBinding Padding}"
+                                                        BorderThickness="{TemplateBinding BorderThickness}"
+                                                        BorderBrush="{TemplateBinding BorderBrush}"
+                                                        Background="{TemplateBinding Background}">
+                                                    <ContentPresenter HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+                                                                      VerticalAlignment="{TemplateBinding VerticalContentAlignment}" />
+                                                </Border>
+                                            </ControlTemplate>
+                                        </Setter.Value>
+                                    </Setter>
+                                    <Style.Triggers>
+                                        <Trigger Property="IsSelected" Value="True">
+                                            <Setter Property="BorderBrush" Value="{DynamicResource FocusBrush}" />
+                                        </Trigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </ListBox.ItemContainerStyle>
+                            <ListBox.ItemsPanel>
+                                <ItemsPanelTemplate>
+                                    <StackPanel Orientation="Horizontal" />
+                                </ItemsPanelTemplate>
+                            </ListBox.ItemsPanel>
+                            <ListBox.ItemTemplate>
+                                <DataTemplate>
+                                    <Border Width="{x:Static presentation:LayoutMetrics.SettingsColorSwatchSize}"
+                                            Height="{x:Static presentation:LayoutMetrics.SettingsColorSwatchSize}"
+                                            AutomationProperties.Name="{Binding Name}"
+                                            BorderThickness="{x:Static presentation:LayoutMetrics.SeparatorBorder}"
+                                            BorderBrush="{DynamicResource BorderBrush}"
+                                            Background="{Binding Brush}"
+                                            ToolTip="{Binding Name}" />
+                                </DataTemplate>
+                            </ListBox.ItemTemplate>
+                        </ListBox>
+                        <StackPanel Margin="{x:Static presentation:LayoutMetrics.SettingsLabelMargin}"
+                                    Orientation="Horizontal">
+                            <Border Width="{x:Static presentation:LayoutMetrics.SettingsColorSwatchSize}"
+                                    Height="{x:Static presentation:LayoutMetrics.SettingsColorSwatchSize}"
+                                    Margin="{x:Static presentation:LayoutMetrics.SettingsInlineItemMargin}"
+                                    BorderThickness="{x:Static presentation:LayoutMetrics.SeparatorBorder}"
+                                    BorderBrush="{DynamicResource BorderBrush}"
+                                    Background="{Binding CurrentColorBrush}" />
+                            <TextBlock VerticalAlignment="Center" Text="{Binding CurrentColorText}" />
+                        </StackPanel>
+                        <Button HorizontalAlignment="Left"
+                                Padding="{x:Static presentation:LayoutMetrics.SettingsButtonPadding}"
+                                Click="PickRuleCustomColorClick"
+                                Content="{Binding CustomColorText}" />
+                    </StackPanel>
+
+                    <StackPanel Margin="{x:Static presentation:LayoutMetrics.SettingsFieldMargin}">
+                        <TextBlock Margin="{x:Static presentation:LayoutMetrics.SettingsLabelMargin}"
+                                   FontWeight="SemiBold"
+                                   Text="{Binding PreviewText}" />
+                        <Border BorderThickness="{x:Static presentation:LayoutMetrics.BottomSeparatorBorder}"
+                                BorderBrush="{DynamicResource BorderBrush}"
+                                Background="{Binding Preview.Background}">
+                            <Grid Margin="{x:Static presentation:LayoutMetrics.SettingsSpinnerTextPadding}"
+                                  TextElement.Foreground="{Binding Preview.Foreground}">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto" />
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="Auto" />
+                                </Grid.ColumnDefinitions>
+                                <TextBlock Margin="{x:Static presentation:LayoutMetrics.SettingsInlineItemMargin}"
+                                           VerticalAlignment="Center"
+                                           Text="{Binding Preview.ListTime}" />
+                                <TextBlock Grid.Column="1"
+                                           Margin="{x:Static presentation:LayoutMetrics.SettingsInlineItemMargin}"
+                                           VerticalAlignment="Center"
+                                           Text="{Binding Preview.Title}"
+                                           TextTrimming="CharacterEllipsis" />
+                                <TextBlock Grid.Column="2"
+                                           VerticalAlignment="Center"
+                                           FontWeight="SemiBold"
+                                           Text="{Binding Preview.ProviderMark}" />
+                            </Grid>
+                        </Border>
+                    </StackPanel>
+
+                    <StackPanel Orientation="Horizontal">
+                        <Button Margin="{x:Static presentation:LayoutMetrics.SettingsInlineItemMargin}"
+                                Padding="{x:Static presentation:LayoutMetrics.SettingsButtonPadding}"
+                                Command="{Binding SaveCommand}"
+                                Content="{Binding SaveText}" />
+                        <Button Padding="{x:Static presentation:LayoutMetrics.SettingsButtonPadding}"
+                                Command="{Binding CancelEditCommand}"
+                                Content="{Binding CancelText}" />
+                    </StackPanel>
+                </StackPanel>
+            </Grid>
+            <DataTemplate.Triggers>
+                <DataTrigger Binding="{Binding IsEditing}" Value="True">
+                    <Setter TargetName="ColorRuleListPanel" Property="Visibility" Value="Collapsed" />
+                    <Setter TargetName="ColorRuleEditorPanel" Property="Visibility" Value="Visible" />
+                </DataTrigger>
+            </DataTemplate.Triggers>
+        </DataTemplate>
+        <DataTemplate DataType="{x:Type viewModels:UpdateSettingsViewModel}">
+            <StackPanel>
+                <TextBlock Margin="{x:Static presentation:LayoutMetrics.SettingsLabelMargin}"
+                           Text="{Binding IntervalText}" />
+                <ComboBox Width="{x:Static presentation:LayoutMetrics.SettingsSpinnerWidth}"
+                          HorizontalAlignment="Left"
+                          ItemsSource="{Binding IntervalOptions}"
+                          DisplayMemberPath="Label"
+                          SelectedItem="{Binding SelectedInterval, Mode=TwoWay}" />
+            </StackPanel>
+        </DataTemplate>
+        <DataTemplate DataType="{x:Type viewModels:GeneralSettingsViewModel}">
+            <StackPanel>
+                <CheckBox Margin="{x:Static presentation:LayoutMetrics.SettingsSectionMargin}"
+                          IsChecked="{Binding StartWithWindows, Mode=TwoWay}"
+                          Content="{Binding StartWithWindowsText}" />
+                <StackPanel Margin="{x:Static presentation:LayoutMetrics.SettingsSectionMargin}">
+                    <TextBlock Margin="{x:Static presentation:LayoutMetrics.SettingsLabelMargin}"
+                               FontWeight="SemiBold"
+                               Text="{Binding ApplicationInfoHeadingText}" />
+                    <TextBlock Margin="{x:Static presentation:LayoutMetrics.SettingsInfoValueMargin}"
+                               Text="{Binding ApplicationNameText}" />
+                    <TextBlock Margin="{x:Static presentation:LayoutMetrics.SettingsInfoValueMargin}"
+                               Text="{Binding VersionText}" />
+                    <TextBlock Margin="{x:Static presentation:LayoutMetrics.SettingsInfoValueMargin}"
+                               Text="{Binding BuildTimeText}" />
+                </StackPanel>
+                <StackPanel Margin="{x:Static presentation:LayoutMetrics.SettingsSectionMargin}">
+                    <TextBlock Margin="{x:Static presentation:LayoutMetrics.SettingsLabelMargin}"
+                               FontWeight="SemiBold"
+                               Text="{Binding LocalFilesHeadingText}" />
+                    <Button Margin="{x:Static presentation:LayoutMetrics.SettingsFieldMargin}"
+                            HorizontalAlignment="Left"
+                            Padding="{x:Static presentation:LayoutMetrics.SettingsButtonPadding}"
+                            Command="{Binding OpenRootDirectoryCommand}"
+                            Content="{Binding OpenRootDirectoryText}" />
+                    <Button Margin="{x:Static presentation:LayoutMetrics.SettingsFieldMargin}"
+                            HorizontalAlignment="Left"
+                            Padding="{x:Static presentation:LayoutMetrics.SettingsButtonPadding}"
+                            Command="{Binding OpenSettingsFileCommand}"
+                            Content="{Binding OpenSettingsFileText}" />
+                    <Button Margin="{x:Static presentation:LayoutMetrics.SettingsFieldMargin}"
+                            HorizontalAlignment="Left"
+                            Padding="{x:Static presentation:LayoutMetrics.SettingsButtonPadding}"
+                            Command="{Binding OpenLogsDirectoryCommand}"
+                            Content="{Binding OpenLogsDirectoryText}" />
+                    <Button HorizontalAlignment="Left"
+                            Padding="{x:Static presentation:LayoutMetrics.SettingsButtonPadding}"
+                            Command="{Binding OpenLatestLogFileCommand}"
+                            Content="{Binding OpenLatestLogFileText}" />
+                </StackPanel>
+                <Separator Margin="{x:Static presentation:LayoutMetrics.SettingsSectionMargin}"
+                           Background="{DynamicResource BorderBrush}" />
+                <Button HorizontalAlignment="Left"
+                        Padding="{x:Static presentation:LayoutMetrics.SettingsButtonPadding}"
+                        Command="{Binding ResetToDefaultsCommand}"
+                        Content="{Binding ResetToDefaultsText}" />
+            </StackPanel>
+        </DataTemplate>
+    </Window.Resources>
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+
+        <Grid Grid.Row="0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="210" />
+                <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
+
+            <ListBox x:Name="CategoryList"
+                     Grid.Column="0"
+                     Margin="12"
+                     Padding="0"
+                     ItemsSource="{Binding Categories}"
+                     SelectedItem="{Binding SelectedCategory}"
+                     DisplayMemberPath="Title"
+                     BorderBrush="{DynamicResource BorderBrush}"
+                     Background="{DynamicResource PanelBackgroundBrush}"
+                     Foreground="{DynamicResource PrimaryTextBrush}"
+                     KeyboardNavigation.TabIndex="0"
+                     KeyboardNavigation.TabNavigation="Once" />
+
+            <Border Grid.Column="1"
+                    Margin="0,12,12,12"
+                    Padding="20"
+                    BorderThickness="1"
+                    BorderBrush="{DynamicResource BorderBrush}"
+                    Background="{DynamicResource PanelBackgroundBrush}">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="*" />
+                    </Grid.RowDefinitions>
+                    <TextBlock FontSize="20"
+                               FontWeight="SemiBold"
+                               Text="{Binding SelectedCategory.Title}" />
+                    <ScrollViewer x:Name="CategoryScrollViewer"
+                                  Grid.Row="1"
+                                  Margin="0,18,0,0"
+                                  HorizontalScrollBarVisibility="Disabled"
+                                  VerticalScrollBarVisibility="Auto">
+                        <ContentControl x:Name="CategoryContent"
+                                        Focusable="True"
+                                        KeyboardNavigation.IsTabStop="True"
+                                        KeyboardNavigation.TabIndex="1"
+                                        Content="{Binding SelectedCategory.Content}" />
+                    </ScrollViewer>
+                </Grid>
+            </Border>
+        </Grid>
+
+        <Border Grid.Row="1"
+                Padding="12"
+                BorderThickness="0,1,0,0"
+                BorderBrush="{DynamicResource BorderBrush}"
+                Background="{DynamicResource PanelBackgroundBrush}">
+            <StackPanel HorizontalAlignment="Right" Orientation="Horizontal">
+                <Button x:Name="OkButton"
+                        MinWidth="88"
+                        Padding="12,6"
+                        KeyboardNavigation.TabIndex="2"
+                        Command="{Binding OkCommand}"
+                        Content="{Binding OkText}" />
+                <Button x:Name="ApplyButton"
+                        MinWidth="88"
+                        Margin="8,0,0,0"
+                        Padding="12,6"
+                        KeyboardNavigation.TabIndex="3"
+                        Command="{Binding ApplyCommand}"
+                        Content="{Binding ApplyText}" />
+                <Button x:Name="CancelButton"
+                        MinWidth="88"
+                        Margin="8,0,0,0"
+                        Padding="12,6"
+                        KeyboardNavigation.TabIndex="4"
+                        Command="{Binding CancelCommand}"
+                        Content="{Binding CancelText}" />
+            </StackPanel>
+        </Border>
+    </Grid>
+</Window>

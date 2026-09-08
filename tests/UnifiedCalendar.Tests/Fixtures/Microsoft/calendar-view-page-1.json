@@ -1,0 +1,28 @@
+{
+  "@odata.context": "https://graph.microsoft.com/v1.0/$metadata#users('fixture')/calendars('fixture-primary-calendar')/calendarView",
+  "@odata.nextLink": "https://graph.microsoft.com/v1.0/me/calendars/fixture-primary-calendar/calendarView?$skiptoken=event-page-2",
+  "value": [
+    {
+      "id": "fixture-event-1",
+      "subject": "Fixture timed event",
+      "body": { "contentType": "html", "content": "<p>First</p><p>Second &amp; safe</p>" },
+      "location": { "displayName": "Fixture location" },
+      "start": { "dateTime": "2026-08-28T09:00:00+09:00", "timeZone": "UTC" },
+      "end": { "dateTime": "2026-08-28T10:00:00+09:00", "timeZone": "UTC" },
+      "isAllDay": false,
+      "isCancelled": false,
+      "responseStatus": { "response": "accepted", "time": "2026-08-01T00:00:00Z" },
+      "categories": ["Fixture Unknown", "Fixture Blue"],
+      "webLink": "https://calendar.example.test/event/fixture-event-1",
+      "onlineMeeting": { "joinUrl": "https://meeting.example.test/fixture-meeting" }
+    },
+    {
+      "id": "fixture-cancelled",
+      "subject": "Fixture cancelled",
+      "start": { "dateTime": "2026-08-29T00:00:00Z", "timeZone": "UTC" },
+      "end": { "dateTime": "2026-08-29T01:00:00Z", "timeZone": "UTC" },
+      "isAllDay": false,
+      "isCancelled": true
+    }
+  ]
+}

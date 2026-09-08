@@ -1,0 +1,49 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <UseWPF>true</UseWPF>
+    <UseWindowsForms>true</UseWindowsForms>
+    <DisableImplicitNamespaceImports>true</DisableImplicitNamespaceImports>
+    <ApplicationManifest>app.manifest</ApplicationManifest>
+    <!-- WPF hosts the app; Windows Forms is used only for NotifyIcon. ApplicationConfiguration.Initialize is not used, and DPI awareness is declared as PerMonitorV2 in app.manifest. -->
+    <NoWarn>$(NoWarn);WFAC010</NoWarn>
+    <Version Condition="'$(Version)' == ''">1.0.0</Version>
+    <InformationalVersion>$(Version)</InformationalVersion>
+    <IncludeSourceRevisionInInformationalVersion>false</IncludeSourceRevisionInInformationalVersion>
+    <Product>UnifiedCalendar</Product>
+    <Company>Logic and Design Inc.</Company>
+    <Copyright>Copyright © 2026 Logic and Design Inc.</Copyright>
+    <AssemblyTitle>UnifiedCalendar</AssemblyTitle>
+    <Description>Google と Microsoft 365 の予定を1つの時系列へまとめて表示する常駐アプリ</Description>
+    <ApplicationIcon>Resources\UnifiedCalendar.ico</ApplicationIcon>
+    <UnifiedCalendarBuildTimestampUtc Condition="'$(UnifiedCalendarBuildTimestampUtc)' == ''">$([System.DateTime]::UtcNow.ToString('yyyy-MM-ddTHH:mm:ss.fffZ'))</UnifiedCalendarBuildTimestampUtc>
+    <UnifiedCalendarGoogleClientId Condition="'$(UnifiedCalendarGoogleClientId)' == ''" />
+    <UnifiedCalendarGoogleClientSecret Condition="'$(UnifiedCalendarGoogleClientSecret)' == ''" />
+    <UnifiedCalendarMicrosoftClientId Condition="'$(UnifiedCalendarMicrosoftClientId)' == ''" />
+  </PropertyGroup>
+  <ItemGroup>
+    <AssemblyMetadata Include="BuildTimestampUtc" Value="$(UnifiedCalendarBuildTimestampUtc)" />
+    <AssemblyMetadata Include="GoogleClientId" Value="$(UnifiedCalendarGoogleClientId)" />
+    <AssemblyMetadata Include="GoogleClientSecret" Value="$(UnifiedCalendarGoogleClientSecret)" />
+    <AssemblyMetadata Include="MicrosoftClientId" Value="$(UnifiedCalendarMicrosoftClientId)" />
+  </ItemGroup>
+  <ItemGroup>
+    <Using Remove="System.Drawing" />
+    <Using Remove="System.Windows.Forms" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\UnifiedCalendar.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\UnifiedCalendar.Core\UnifiedCalendar.Core.csproj" />
+    <ProjectReference Include="..\UnifiedCalendar.Infrastructure\UnifiedCalendar.Infrastructure.csproj" />
+    <ProjectReference Include="..\UnifiedCalendar.Providers.Google\UnifiedCalendar.Providers.Google.csproj" />
+    <ProjectReference Include="..\UnifiedCalendar.Providers.Microsoft\UnifiedCalendar.Providers.Microsoft.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="CommunityToolkit.Mvvm" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection" />
+    <PackageReference Include="Microsoft.Extensions.Hosting" />
+    <PackageReference Include="Serilog" />
+  </ItemGroup>
+</Project>

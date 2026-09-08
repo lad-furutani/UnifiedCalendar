@@ -1,0 +1,360 @@
+<Window x:Class="UnifiedCalendar.App.MainWindow"
+        x:Name="MainRoot"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:controls="clr-namespace:UnifiedCalendar.App.Controls"
+        xmlns:core="clr-namespace:UnifiedCalendar.Core;assembly=UnifiedCalendar.Core"
+        xmlns:presentation="clr-namespace:UnifiedCalendar.App.Presentation"
+        xmlns:viewModels="clr-namespace:UnifiedCalendar.App.ViewModels"
+        Title="{x:Static core:AppIdentity.ProductName}"
+        Icon="Resources/UnifiedCalendar.ico"
+        Width="{x:Static presentation:LayoutMetrics.InitialMainWidth}"
+        Height="{x:Static presentation:LayoutMetrics.InitialMainHeight}"
+        MinWidth="{x:Static presentation:LayoutMetrics.MinimumMainWidth}"
+        MinHeight="{x:Static presentation:LayoutMetrics.MinimumMainHeight}"
+        ResizeMode="CanResize"
+        ShowInTaskbar="True"
+        Topmost="False"
+        FontFamily="Yu Gothic UI"
+        FontSize="{Binding FontSizeDip}"
+        Background="{DynamicResource WindowBackgroundBrush}"
+        Foreground="{DynamicResource PrimaryTextBrush}"
+        PreviewKeyDown="WindowPreviewKeyDown"
+        PreviewMouseLeftButtonUp="WindowPreviewMouseLeftButtonUp"
+        LocationChanged="WindowLocationChanged"
+        SizeChanged="WindowSizeChanged"
+        StateChanged="WindowStateChanged">
+    <Window.Resources>
+        <BooleanToVisibilityConverter x:Key="BooleanVisibility" />
+        <presentation:ValueVisibilityConverter x:Key="ValueVisibility" />
+
+        <Style x:Key="FocusVisual" TargetType="Control">
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate>
+                        <Border Margin="1"
+                                BorderThickness="{x:Static presentation:LayoutMetrics.FocusBorder}"
+                                BorderBrush="{DynamicResource FocusBrush}" />
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <Style x:Key="TimelineItemStyle" TargetType="ListBoxItem">
+            <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+            <Setter Property="VerticalContentAlignment" Value="Stretch" />
+            <Setter Property="Padding" Value="0" />
+            <Setter Property="Margin" Value="0" />
+            <Setter Property="Background" Value="Transparent" />
+            <Setter Property="BorderThickness" Value="0" />
+            <Setter Property="Focusable" Value="{Binding IsFocusable}" />
+            <Setter Property="IsTabStop" Value="{Binding IsFocusable}" />
+            <Setter Property="FocusVisualStyle" Value="{StaticResource FocusVisual}" />
+            <EventSetter Event="PreviewMouseLeftButtonDown" Handler="TimelineItemMouseLeftButtonDown" />
+            <EventSetter Event="PreviewMouseLeftButtonUp" Handler="TimelineItemMouseLeftButtonUp" />
+            <Style.Triggers>
+                <Trigger Property="IsSelected" Value="True">
+                    <Setter Property="Background" Value="Transparent" />
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+
+        <DataTemplate DataType="{x:Type viewModels:DayHeaderItemViewModel}">
+            <Border Padding="10,8"
+                    BorderThickness="{x:Static presentation:LayoutMetrics.HeaderSeparatorBorder}"
+                    BorderBrush="{DynamicResource BorderBrush}"
+                    Background="{DynamicResource HeaderBackgroundBrush}">
+                <TextBlock FontWeight="SemiBold"
+                           Foreground="{DynamicResource PrimaryTextBrush}"
+                           Text="{Binding Header}" />
+            </Border>
+        </DataTemplate>
+
+        <DataTemplate DataType="{x:Type viewModels:EventRowViewModel}">
+            <Border x:Name="EventBorder"
+                    MinHeight="{Binding DataContext.EventRowMinHeight, ElementName=MainRoot}"
+                    BorderThickness="{x:Static presentation:LayoutMetrics.BottomSeparatorBorder}"
+                    BorderBrush="{DynamicResource BorderBrush}"
+                    Background="{Binding Background}"
+                    ToolTip="{Binding Tooltip}">
+                <Grid>
+                    <Border x:Name="HoverOverlay"
+                            Panel.ZIndex="0"
+                            Background="{DynamicResource HoverOverlayBrush}"
+                            Opacity="0" />
+                    <Border x:Name="FocusBorder"
+                            Panel.ZIndex="2"
+                            BorderThickness="{x:Static presentation:LayoutMetrics.FocusBorder}"
+                            BorderBrush="{DynamicResource FocusBrush}"
+                            Opacity="0" />
+                    <Grid Panel.ZIndex="1"
+                          Margin="{Binding DataContext.EventRowMargin, ElementName=MainRoot}"
+                          TextElement.Foreground="{Binding Foreground}">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="{Binding DataContext.TimeColumnWidth, ElementName=MainRoot}" />
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Grid.Column="0"
+                                   VerticalAlignment="Center"
+                                   Text="{Binding ListTime}"
+                                   TextTrimming="CharacterEllipsis"
+                                   TextWrapping="NoWrap" />
+                        <TextBlock Grid.Column="1"
+                                   Margin="0,0,8,0"
+                                   VerticalAlignment="Center"
+                                   Text="{Binding Title}"
+                                   TextTrimming="CharacterEllipsis"
+                                   TextWrapping="NoWrap" />
+                        <TextBlock x:Name="AttentionIcon"
+                                   Grid.Column="2"
+                                   Margin="0,0,8,0"
+                                   VerticalAlignment="Center"
+                                   AutomationProperties.Name="{Binding AttentionText}"
+                                   Focusable="False"
+                                   FontFamily="Segoe MDL2 Assets"
+                                   FontSize="14"
+                                   Foreground="{Binding Foreground}"
+                                   KeyboardNavigation.IsTabStop="False"
+                                   Text="&#xE946;"
+                                   ToolTip="{Binding AttentionText}"
+                                   Visibility="{Binding AttentionText, Converter={StaticResource ValueVisibility}}" />
+                        <Button x:Name="MeetingButton"
+                                Grid.Column="3"
+                                Margin="0,1,8,1"
+                                Padding="7,4"
+                                VerticalAlignment="Center"
+                                FontFamily="Segoe MDL2 Assets"
+                                FontSize="14"
+                                Command="{Binding OpenMeetingCommand}"
+                                Content="&#xE8EA;"
+                                ToolTip="{Binding MeetingLabel}"
+                                Visibility="{Binding HasMeetingUri, Converter={StaticResource BooleanVisibility}}" />
+                        <TextBlock Grid.Column="4"
+                                   VerticalAlignment="Center"
+                                   FontWeight="SemiBold"
+                                   Focusable="False"
+                                   IsHitTestVisible="False"
+                                   Text="{Binding ProviderMark}" />
+                    </Grid>
+                </Grid>
+            </Border>
+            <DataTemplate.Triggers>
+                <DataTrigger Binding="{Binding RelativeSource={RelativeSource AncestorType=ListBoxItem}, Path=IsMouseOver}" Value="True">
+                    <Setter TargetName="HoverOverlay" Property="Opacity" Value="1" />
+                </DataTrigger>
+                <DataTrigger Binding="{Binding RelativeSource={RelativeSource AncestorType=ListBoxItem}, Path=IsKeyboardFocusWithin}" Value="True">
+                    <Setter TargetName="FocusBorder" Property="Opacity" Value="{x:Static presentation:ColorMetrics.FocusOpacity}" />
+                </DataTrigger>
+            </DataTemplate.Triggers>
+        </DataTemplate>
+    </Window.Resources>
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+
+        <Border x:Name="StatusArea"
+                Grid.Row="0"
+                Height="{Binding StatusHeight}"
+                Padding="10,7"
+                BorderThickness="{x:Static presentation:LayoutMetrics.BottomSeparatorBorder}"
+                BorderBrush="{DynamicResource BorderBrush}"
+                Background="{DynamicResource PanelBackgroundBrush}">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+                <TextBlock Grid.Column="0"
+                           Margin="0,0,16,0"
+                           VerticalAlignment="Center"
+                           FontWeight="SemiBold"
+                           Text="{Binding CurrentTimeText}" />
+                <TextBlock Grid.Column="1"
+                           Margin="0,0,16,0"
+                           VerticalAlignment="Center"
+                           Foreground="{DynamicResource SecondaryTextBrush}"
+                           Text="{Binding LastUpdateText}"
+                           Visibility="{Binding HasLastUpdate, Converter={StaticResource BooleanVisibility}}" />
+                <Button x:Name="WarningButton"
+                        Grid.Column="2"
+                        Width="32"
+                        Height="{Binding WarningButtonHeight}"
+                        Margin="0,0,10,0"
+                        Padding="4"
+                        HorizontalAlignment="Left"
+                        VerticalAlignment="Center"
+                        AutomationProperties.Name="{Binding AccountWarningsText}"
+                        Click="WarningButtonClick"
+                        Content="⚠"
+                        Foreground="{DynamicResource ErrorBrush}"
+                        ToolTip="{Binding AccountWarningsText}"
+                        Visibility="{Binding HasAccountWarnings, Converter={StaticResource BooleanVisibility}}" />
+                <Button x:Name="RefreshButton"
+                        Grid.Column="3"
+                        Padding="10,5"
+                        KeyboardNavigation.TabIndex="0"
+                        Command="{Binding ManualRefreshCommand}"
+                        Content="{Binding ManualRefreshText}">
+                    <Button.Style>
+                        <Style TargetType="Button"
+                               BasedOn="{StaticResource {x:Type Button}}">
+                            <Setter Property="Visibility" Value="Visible" />
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding IsSyncing}" Value="True">
+                                    <Setter Property="Visibility" Value="Collapsed" />
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </Button.Style>
+                </Button>
+                <Grid Grid.Column="3"
+                      Width="26"
+                      Height="26"
+                      ToolTip="{Binding UpdatingText}">
+                    <Grid.Style>
+                        <Style TargetType="Grid">
+                            <Setter Property="Visibility" Value="Collapsed" />
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding IsSyncing}" Value="True">
+                                    <Setter Property="Visibility" Value="Visible" />
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </Grid.Style>
+                    <Grid.RenderTransform>
+                        <RotateTransform x:Name="SpinnerRotation" CenterX="13" CenterY="13" />
+                    </Grid.RenderTransform>
+                    <Grid.Triggers>
+                        <EventTrigger RoutedEvent="Loaded">
+                            <BeginStoryboard>
+                                <Storyboard RepeatBehavior="Forever">
+                                    <DoubleAnimation Storyboard.TargetName="SpinnerRotation"
+                                                     Storyboard.TargetProperty="Angle"
+                                                     From="0" To="360" Duration="0:0:0.9" />
+                                </Storyboard>
+                            </BeginStoryboard>
+                        </EventTrigger>
+                    </Grid.Triggers>
+                    <Ellipse Width="20" Height="20" StrokeThickness="3" Stroke="{DynamicResource BorderBrush}" />
+                    <Path Stroke="{DynamicResource FocusBrush}"
+                          StrokeThickness="3"
+                          Data="M 13,3 A 10,10 0 0 1 23,13" />
+                </Grid>
+            </Grid>
+        </Border>
+
+        <Grid Grid.Row="1">
+            <Grid Visibility="{Binding IsTimelineVisible, Converter={StaticResource BooleanVisibility}}">
+                <ListBox x:Name="TimelineList"
+                         ItemsSource="{Binding TimelineItems}"
+                         ItemContainerStyle="{StaticResource TimelineItemStyle}"
+                         Background="{DynamicResource PanelBackgroundBrush}"
+                         BorderThickness="0"
+                         ScrollViewer.CanContentScroll="True"
+                         ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+                         ScrollViewer.VerticalScrollBarVisibility="Auto"
+                         VirtualizingPanel.IsVirtualizing="True"
+                         VirtualizingPanel.VirtualizationMode="Recycling"
+                         VirtualizingPanel.ScrollUnit="Pixel"
+                         KeyboardNavigation.TabNavigation="Continue"
+                         KeyboardNavigation.TabIndex="1"
+                         PreviewKeyDown="TimelinePreviewKeyDown"
+                         LostMouseCapture="TimelineListLostMouseCapture"
+                         SizeChanged="TimelineListSizeChanged"
+                         ScrollViewer.ScrollChanged="TimelineScrollChanged" />
+                <Border x:Name="StickyDateOverlay"
+                        Panel.ZIndex="1"
+                        Padding="10,8"
+                        HorizontalAlignment="Stretch"
+                        VerticalAlignment="Top"
+                        IsHitTestVisible="False"
+                        BorderThickness="{x:Static presentation:LayoutMetrics.BottomSeparatorBorder}"
+                        BorderBrush="{DynamicResource BorderBrush}"
+                        Background="{DynamicResource HeaderBackgroundBrush}">
+                    <TextBlock FontWeight="SemiBold"
+                               Foreground="{DynamicResource PrimaryTextBrush}"
+                               Text="{Binding StickyDateText}" />
+                </Border>
+            </Grid>
+
+            <Grid HorizontalAlignment="Center"
+                  VerticalAlignment="Center"
+                  Margin="24"
+                  Visibility="{Binding IsLoading, Converter={StaticResource BooleanVisibility}}">
+                <TextBlock Text="{Binding StateMessage}" />
+            </Grid>
+            <Grid HorizontalAlignment="Center"
+                  VerticalAlignment="Center"
+                  Margin="24"
+                  Visibility="{Binding IsEmpty, Converter={StaticResource BooleanVisibility}}">
+                <TextBlock Text="{Binding StateMessage}" />
+            </Grid>
+            <Grid HorizontalAlignment="Center"
+                  VerticalAlignment="Center"
+                  Margin="24"
+                  Visibility="{Binding IsError, Converter={StaticResource BooleanVisibility}}">
+                <TextBlock Foreground="{DynamicResource ErrorBrush}" Text="{Binding StateMessage}" />
+            </Grid>
+            <StackPanel HorizontalAlignment="Center"
+                        VerticalAlignment="Center"
+                        Margin="24"
+                        Visibility="{Binding IsUnregistered, Converter={StaticResource BooleanVisibility}}">
+                <TextBlock HorizontalAlignment="Center" Text="{Binding StateMessage}" />
+                <TextBlock Margin="{x:Static presentation:LayoutMetrics.UnregisteredOperationMessageMargin}"
+                           HorizontalAlignment="Center"
+                           Foreground="{DynamicResource ErrorBrush}"
+                           Text="{Binding AccountOperationMessage}"
+                           TextWrapping="Wrap"
+                           Visibility="{Binding AccountOperationMessage, Converter={StaticResource ValueVisibility}}" />
+                <Button Margin="0,14,0,0"
+                        Padding="12,6"
+                        KeyboardNavigation.TabIndex="1"
+                        Command="{Binding AddGoogleAccountCommand}"
+                        Content="{Binding AddGoogleAccountText}"
+                        ToolTip="{Binding AddGoogleAccountToolTip}"
+                        ToolTipService.ShowOnDisabled="True" />
+                <Button Margin="0,8,0,0"
+                        Padding="12,6"
+                        KeyboardNavigation.TabIndex="2"
+                        Command="{Binding AddMicrosoftAccountCommand}"
+                        Content="{Binding AddMicrosoftAccountText}"
+                        ToolTip="{Binding AddMicrosoftAccountToolTip}"
+                        ToolTipService.ShowOnDisabled="True" />
+            </StackPanel>
+        </Grid>
+
+        <Popup x:Name="DetailsPopup"
+               AllowsTransparency="True"
+               Closed="DetailsPopupClosed"
+               Opened="DetailsPopupOpened"
+               CustomPopupPlacementCallback="PlaceDetailsPopup"
+               IsOpen="{Binding DataContext.IsDetailsOpen, ElementName=MainRoot, Mode=OneWay}"
+               Placement="Custom"
+               StaysOpen="False">
+            <controls:EventDetailsPopup x:Name="DetailsContent"
+                                        FontSize="{Binding DataContext.FontSizeDip, ElementName=MainRoot}"
+                                        CloseRequested="EventDetailsCloseRequested"
+                                        DataContext="{Binding DataContext.EventDetails, ElementName=MainRoot}" />
+        </Popup>
+
+        <Popup x:Name="WarningPopup"
+               AllowsTransparency="True"
+               Closed="WarningPopupClosed"
+               Opened="WarningPopupOpened"
+               Placement="Bottom"
+               PlacementTarget="{Binding ElementName=WarningButton}"
+               StaysOpen="False">
+            <controls:AccountWarningsPopup x:Name="WarningContent"
+                                           CloseRequested="AccountWarningsCloseRequested"
+                                           DataContext="{Binding DataContext, ElementName=MainRoot}" />
+        </Popup>
+    </Grid>
+</Window>

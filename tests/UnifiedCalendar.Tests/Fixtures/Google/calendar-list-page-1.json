@@ -1,0 +1,19 @@
+{
+  "kind": "calendar#calendarList",
+  "nextPageToken": "calendar-page-2",
+  "items": [
+    {
+      "id": "primary-calendar@example.test",
+      "summary": "Fixture Primary",
+      "primary": true,
+      "accessRole": "owner",
+      "backgroundColor": "#112233"
+    },
+    {
+      "id": "shared-calendar@example.test",
+      "summary": "Fixture Shared",
+      "accessRole": "reader",
+      "backgroundColor": "#445566"
+    }
+  ]
+}

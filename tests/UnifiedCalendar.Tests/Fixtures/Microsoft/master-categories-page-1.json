@@ -1,0 +1,7 @@
+{
+  "@odata.context": "https://graph.microsoft.com/v1.0/$metadata#users('fixture')/outlook/masterCategories",
+  "@odata.nextLink": "https://graph.microsoft.com/v1.0/me/outlook/masterCategories?$skiptoken=category-page-2",
+  "value": [
+    { "id": "fixture-category-1", "displayName": "Fixture Other", "color": "preset1" }
+  ]
+}

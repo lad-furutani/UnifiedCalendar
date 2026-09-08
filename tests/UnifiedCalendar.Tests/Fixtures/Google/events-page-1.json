@@ -1,0 +1,27 @@
+{
+  "kind": "calendar#events",
+  "nextPageToken": "events-page-2",
+  "items": [
+    {
+      "id": "fixture-event-1",
+      "summary": "Fixture timed event",
+      "description": "First<br>Second &amp; safe",
+      "location": "Fixture room",
+      "status": "confirmed",
+      "htmlLink": "https://calendar.example.test/event/fixture-event-1",
+      "hangoutLink": "https://meet.example.test/fallback",
+      "colorId": "5",
+      "start": { "dateTime": "2026-08-28T09:00:00+09:00", "timeZone": "Asia/Tokyo" },
+      "end": { "dateTime": "2026-08-28T10:00:00+09:00", "timeZone": "Asia/Tokyo" },
+      "attendees": [
+        { "email": "other@example.test", "responseStatus": "declined" },
+        { "email": "self@example.test", "self": true, "responseStatus": "accepted" }
+      ],
+      "conferenceData": {
+        "entryPoints": [
+          { "entryPointType": "video", "uri": "https://meet.example.test/fixture-meeting" }
+        ]
+      }
+    }
+  ]
+}

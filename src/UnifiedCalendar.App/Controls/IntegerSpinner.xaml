@@ -1,0 +1,38 @@
+<UserControl x:Class="UnifiedCalendar.App.Controls.IntegerSpinner"
+             x:Name="SpinnerRoot"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:presentation="clr-namespace:UnifiedCalendar.App.Presentation"
+             Focusable="False">
+    <Border BorderThickness="{x:Static presentation:LayoutMetrics.SeparatorBorder}"
+            BorderBrush="{DynamicResource BorderBrush}"
+            Background="{DynamicResource PanelBackgroundBrush}">
+        <Grid>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="{x:Static presentation:LayoutMetrics.SettingsSpinnerButtonGridWidth}" />
+                <ColumnDefinition Width="{x:Static presentation:LayoutMetrics.SettingsSpinnerButtonGridWidth}" />
+            </Grid.ColumnDefinitions>
+            <TextBox x:Name="ValueTextBox"
+                     Grid.Column="0"
+                     Padding="{x:Static presentation:LayoutMetrics.SettingsSpinnerTextPadding}"
+                     HorizontalContentAlignment="Right"
+                     VerticalContentAlignment="Center"
+                     BorderThickness="0"
+                     Background="Transparent"
+                     Foreground="{DynamicResource PrimaryTextBrush}"
+                     PreviewTextInput="ValueTextBoxPreviewTextInput"
+                     PreviewKeyDown="ValueTextBoxPreviewKeyDown"
+                     LostKeyboardFocus="ValueTextBoxLostKeyboardFocus"
+                     TextChanged="ValueTextBoxTextChanged" />
+            <Button Grid.Column="1"
+                    Padding="0"
+                    Click="DecreaseButtonClick"
+                    Content="−" />
+            <Button Grid.Column="2"
+                    Padding="0"
+                    Click="IncreaseButtonClick"
+                    Content="＋" />
+        </Grid>
+    </Border>
+</UserControl>

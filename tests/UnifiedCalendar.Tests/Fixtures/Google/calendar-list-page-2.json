@@ -1,0 +1,23 @@
+{
+  "kind": "calendar#calendarList",
+  "items": [
+    {
+      "id": "subscription-calendar@example.test",
+      "summaryOverride": "Fixture Subscription",
+      "accessRole": "reader",
+      "backgroundColor": "not-a-color"
+    },
+    {
+      "id": "freebusy-calendar@example.test",
+      "summary": "Fixture Free Busy",
+      "accessRole": "freeBusyReader"
+    },
+    {
+      "id": "hidden-writer-calendar@example.test",
+      "summary": "Fixture Hidden Writer",
+      "accessRole": "writerWithoutPrivateAccess",
+      "hidden": true,
+      "backgroundColor": "#667788"
+    }
+  ]
+}

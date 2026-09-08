@@ -1,0 +1,7 @@
+{
+  "kind": "calendar#colors",
+  "event": {
+    "5": { "background": "#778899", "foreground": "#ffffff" }
+  },
+  "calendar": {}
+}

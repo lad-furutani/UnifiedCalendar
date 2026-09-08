@@ -1,0 +1,71 @@
+<UserControl x:Class="UnifiedCalendar.App.Controls.AccountWarningsPopup"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:presentation="clr-namespace:UnifiedCalendar.App.Presentation"
+             MinWidth="320"
+             MaxWidth="{x:Static presentation:LayoutMetrics.PopupMaximumWidth}"
+             MaxHeight="{x:Static presentation:LayoutMetrics.PopupMaximumHeight}"
+             Focusable="True"
+             IsTabStop="False"
+             KeyboardNavigation.TabNavigation="Cycle"
+             PreviewKeyDown="OnPreviewKeyDown">
+    <UserControl.Resources>
+        <BooleanToVisibilityConverter x:Key="BooleanVisibility" />
+        <Style x:Key="PopupFocusVisual" TargetType="Control">
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate>
+                        <Border Margin="1"
+                                BorderThickness="{x:Static presentation:LayoutMetrics.FocusBorder}"
+                                BorderBrush="{DynamicResource FocusBrush}" />
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+    </UserControl.Resources>
+    <Border Padding="12"
+            BorderThickness="{x:Static presentation:LayoutMetrics.SeparatorBorder}"
+            BorderBrush="{DynamicResource BorderBrush}"
+            Background="{DynamicResource PanelBackgroundBrush}">
+        <ScrollViewer VerticalScrollBarVisibility="Auto"
+                      HorizontalScrollBarVisibility="Disabled">
+            <ItemsControl x:Name="WarningItems" ItemsSource="{Binding AccountWarnings}">
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate>
+                        <Grid Margin="0,4">
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="Auto" />
+                            </Grid.RowDefinitions>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Grid.Column="0"
+                                       MaxWidth="340"
+                                       Margin="0,0,10,0"
+                                       VerticalAlignment="Center"
+                                       Foreground="{DynamicResource ErrorBrush}"
+                                       Text="{Binding Message}"
+                                       TextTrimming="CharacterEllipsis"
+                                       TextWrapping="NoWrap"
+                                       ToolTip="{Binding Message}" />
+                            <Button Grid.Column="1"
+                                    Padding="8,4"
+                                    FocusVisualStyle="{StaticResource PopupFocusVisual}"
+                                    Command="{Binding ReauthenticateCommand}"
+                                    Content="{Binding ReauthenticateText}" />
+                            <TextBlock Grid.Row="1"
+                                       Grid.ColumnSpan="2"
+                                       Margin="{x:Static presentation:LayoutMetrics.WarningOperationMessageMargin}"
+                                       Foreground="{DynamicResource ErrorBrush}"
+                                       Text="{Binding OperationMessage}"
+                                       TextWrapping="Wrap"
+                                       Visibility="{Binding HasOperationMessage, Converter={StaticResource BooleanVisibility}}" />
+                        </Grid>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+        </ScrollViewer>
+    </Border>
+</UserControl>

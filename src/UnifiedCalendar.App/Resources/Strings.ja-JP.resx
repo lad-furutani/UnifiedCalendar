@@ -1,0 +1,196 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <resheader name="resmimetype"><value>text/microsoft-resx</value></resheader>
+  <resheader name="version"><value>2.0</value></resheader>
+  <resheader name="reader"><value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
+  <resheader name="writer"><value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
+  <data name="Event.Untitled" xml:space="preserve"><value>（無題）</value></data>
+  <data name="DayHeader.Today" xml:space="preserve"><value>今日 {0:M/d(ddd)}</value></data>
+  <data name="DayHeader.Tomorrow" xml:space="preserve"><value>明日 {0:M/d(ddd)}</value></data>
+  <data name="DayHeader.Date" xml:space="preserve"><value>{0:M/d(ddd)}</value></data>
+  <data name="Event.List.Instant" xml:space="preserve"><value>{0:HH:mm}</value></data>
+  <data name="Event.List.TimedRange" xml:space="preserve"><value>{0:HH:mm}–{1:HH:mm}</value></data>
+  <data name="Event.List.AllDay" xml:space="preserve"><value>終日</value></data>
+  <data name="Event.List.AllDayRange" xml:space="preserve"><value>終日  {0:M/d}～{1:M/d}</value></data>
+  <data name="Event.Detail.TimedSingleDay" xml:space="preserve"><value>{0:M/d(ddd)} {1:HH:mm} ～ {2:HH:mm}</value></data>
+  <data name="Event.Detail.TimedRange" xml:space="preserve"><value>{0:M/d(ddd)} {1:HH:mm} ～ {2:M/d(ddd)} {3:HH:mm}</value></data>
+  <data name="Event.Detail.AllDay" xml:space="preserve"><value>{0:M/d(ddd)} 終日</value></data>
+  <data name="Event.Detail.AllDayRange" xml:space="preserve"><value>{0:M/d(ddd)} ～ {1:M/d(ddd)} 終日</value></data>
+  <data name="Attendee.Accepted" xml:space="preserve"><value>承諾</value></data>
+  <data name="Attendee.Tentative" xml:space="preserve"><value>仮承諾</value></data>
+  <data name="Attendee.NotResponded" xml:space="preserve"><value>未回答</value></data>
+  <data name="Attendee.Declined" xml:space="preserve"><value>辞退</value></data>
+  <data name="Attendee.Unknown" xml:space="preserve"><value>不明</value></data>
+  <data name="Attendee.Status" xml:space="preserve"><value>参加状態: {0}</value></data>
+  <data name="Event.Tooltip" xml:space="preserve"><value>{0}&#x0a;{1}</value></data>
+  <data name="Event.TooltipWithAttention" xml:space="preserve"><value>{0}&#x0a;{1}&#x0a;{2}</value></data>
+  <data name="Status.CurrentTime" xml:space="preserve"><value>{0:HH:mm}</value></data>
+  <data name="Status.LastUpdateToday" xml:space="preserve"><value>最終更新 {0:HH:mm}</value></data>
+  <data name="Status.LastUpdateOtherDay" xml:space="preserve"><value>最終更新 {0:M/d HH:mm}</value></data>
+  <data name="Status.LastUpdateUnavailable" xml:space="preserve"><value>最終更新 --</value></data>
+  <data name="Status.Updating" xml:space="preserve"><value>更新中</value></data>
+  <data name="Status.ManualRefresh" xml:space="preserve"><value>今すぐ更新</value></data>
+  <data name="State.Empty" xml:space="preserve"><value>今後{0}日間の予定はありません</value></data>
+  <data name="State.Loading" xml:space="preserve"><value>予定を取得中…</value></data>
+  <data name="State.Unregistered" xml:space="preserve"><value>アカウントを追加してください</value></data>
+  <data name="State.Error" xml:space="preserve"><value>予定を更新できませんでした。表示できる予定がありません。</value></data>
+  <data name="Account.AddGoogle" xml:space="preserve"><value>Googleアカウントを追加</value></data>
+  <data name="Account.AddMicrosoft" xml:space="preserve"><value>Microsoftアカウントを追加</value></data>
+  <data name="Account.Reauthenticate" xml:space="preserve"><value>再認証</value></data>
+  <data name="Error.Authentication" xml:space="preserve"><value>{0}: 再認証が必要です</value></data>
+  <data name="Error.RateLimited" xml:space="preserve"><value>{0}: レート制限中です</value></data>
+  <data name="Error.Sync" xml:space="preserve"><value>{0}: 同期エラー</value></data>
+  <data name="Detail.Location" xml:space="preserve"><value>場所</value></data>
+  <data name="Detail.Meeting" xml:space="preserve"><value>オンライン会議</value></data>
+  <data name="Detail.Description" xml:space="preserve"><value>説明</value></data>
+  <data name="Detail.Source" xml:space="preserve"><value>取得元</value></data>
+  <data name="Detail.Calendar" xml:space="preserve"><value>カレンダー</value></data>
+  <data name="Detail.Response" xml:space="preserve"><value>参加状態</value></data>
+  <data name="Detail.OpenSource" xml:space="preserve"><value>元の予定を開く</value></data>
+  <data name="Provider.Google" xml:space="preserve"><value>Google Calendar</value></data>
+  <data name="Provider.Microsoft" xml:space="preserve"><value>Microsoft 365</value></data>
+  <data name="Tray.ShowHide" xml:space="preserve"><value>表示/非表示</value></data>
+  <data name="Tray.Refresh" xml:space="preserve"><value>今すぐ更新</value></data>
+  <data name="Tray.Settings" xml:space="preserve"><value>設定</value></data>
+  <data name="Tray.Exit" xml:space="preserve"><value>終了</value></data>
+  <data name="Settings.Title" xml:space="preserve"><value>設定</value></data>
+  <data name="Settings.Category.Account" xml:space="preserve"><value>アカウント</value></data>
+  <data name="Settings.Category.CalendarSelection" xml:space="preserve"><value>カレンダー選択</value></data>
+  <data name="Settings.Category.Display" xml:space="preserve"><value>表示</value></data>
+  <data name="Settings.Category.ColorRules" xml:space="preserve"><value>色分けルール</value></data>
+  <data name="Settings.Category.Update" xml:space="preserve"><value>更新</value></data>
+  <data name="Settings.Category.General" xml:space="preserve"><value>一般</value></data>
+  <data name="Settings.Placeholder" xml:space="preserve"><value>このカテゴリは後続フェーズで実装します。</value></data>
+  <data name="Settings.Accounts.Heading" xml:space="preserve"><value>登録済みアカウント</value></data>
+  <data name="Settings.Accounts.Empty" xml:space="preserve"><value>登録済みのアカウントはありません。</value></data>
+  <data name="Settings.Accounts.ProviderUnavailable" xml:space="preserve"><value>このサービスは ClientId が構成されていないため利用できません。</value></data>
+  <data name="Settings.Accounts.AuthenticationProgress" xml:space="preserve"><value>{0} の認証を待っています…</value></data>
+  <data name="Settings.Accounts.OperationProgress" xml:space="preserve"><value>処理中…</value></data>
+  <data name="Settings.Accounts.Syncing" xml:space="preserve"><value>同期中</value></data>
+  <data name="Settings.Accounts.SyncSucceeded" xml:space="preserve"><value>正常</value></data>
+  <data name="Settings.Accounts.SyncError" xml:space="preserve"><value>同期エラー</value></data>
+  <data name="Settings.Accounts.NotSyncTarget" xml:space="preserve"><value>同期対象外</value></data>
+  <data name="Settings.Accounts.State.Enabled" xml:space="preserve"><value>有効</value></data>
+  <data name="Settings.Accounts.State.Disabled" xml:space="preserve"><value>無効</value></data>
+  <data name="Settings.Accounts.AuthenticationError" xml:space="preserve"><value>認証エラー</value></data>
+  <data name="Settings.Accounts.RateLimited" xml:space="preserve"><value>レート制限中</value></data>
+  <data name="Settings.Accounts.NotUpdated" xml:space="preserve"><value>未更新</value></data>
+  <data name="Settings.Accounts.LastSuccessToday" xml:space="preserve"><value>最終正常更新: 今日 {0:HH:mm}</value></data>
+  <data name="Settings.Accounts.LastSuccessOtherDay" xml:space="preserve"><value>最終正常更新: {0:yyyy/MM/dd HH:mm}</value></data>
+  <data name="Settings.Accounts.LastSuccessUnavailable" xml:space="preserve"><value>最終正常更新: 未取得</value></data>
+  <data name="Settings.Accounts.Enable" xml:space="preserve"><value>有効にする</value></data>
+  <data name="Settings.Accounts.Disable" xml:space="preserve"><value>無効にする</value></data>
+  <data name="Settings.Accounts.Delete" xml:space="preserve"><value>削除</value></data>
+  <data name="Settings.Accounts.DeletePrompt" xml:space="preserve"><value>アカウント「{0}」を削除しますか？</value></data>
+  <data name="Settings.Accounts.Duplicate" xml:space="preserve"><value>このアカウントはすでに登録されています。</value></data>
+  <data name="Settings.Accounts.AuthenticationFailed" xml:space="preserve"><value>認証を完了できませんでした。もう一度お試しください。</value></data>
+  <data name="Settings.Accounts.CalendarDiscoveryFailed" xml:space="preserve"><value>カレンダー一覧を取得できなかったため、アカウントを登録しませんでした。</value></data>
+  <data name="Settings.Accounts.OperationFailed" xml:space="preserve"><value>アカウント操作を完了できませんでした。</value></data>
+  <data name="Settings.Accounts.CleanupWarning" xml:space="preserve"><value>アカウントは削除しましたが、ローカルデータの一部を削除できませんでした。</value></data>
+  <data name="Settings.Accounts.AllCalendarsOff" xml:space="preserve"><value>表示するカレンダーがありません。</value></data>
+  <data name="Settings.Calendars.Heading" xml:space="preserve"><value>表示するカレンダー</value></data>
+  <data name="Settings.Calendars.Refresh" xml:space="preserve"><value>一覧を再取得</value></data>
+  <data name="Settings.Calendars.Loading" xml:space="preserve"><value>カレンダー一覧を取得しています…</value></data>
+  <data name="Settings.Calendars.Empty" xml:space="preserve"><value>表示できるカレンダーがありません。</value></data>
+  <data name="Settings.Calendars.BackToAccounts" xml:space="preserve"><value>アカウント一覧へ戻る</value></data>
+  <data name="Settings.Calendars.DiscoveryFailed" xml:space="preserve"><value>カレンダー一覧を取得できませんでした。前回または保存済みの一覧を表示しています。</value></data>
+  <data name="Settings.Calendars.UpdateFailed" xml:space="preserve"><value>カレンダーの表示設定を更新できませんでした。</value></data>
+  <data name="Settings.Calendars.NameUnavailable" xml:space="preserve"><value>名称を取得できていません</value></data>
+  <data name="Settings.Calendars.Show" xml:space="preserve"><value>表示する</value></data>
+  <data name="Settings.Calendars.ReadUnavailable" xml:space="preserve"><value>権限が足りないため予定を取得できません。</value></data>
+  <data name="Settings.Calendars.SyncWarning" xml:space="preserve"><value>同期エラー</value></data>
+  <data name="Settings.Calendars.Sync.Network" xml:space="preserve"><value>ネットワークに接続できませんでした。</value></data>
+  <data name="Settings.Calendars.Sync.Timeout" xml:space="preserve"><value>カレンダーの取得がタイムアウトしました。</value></data>
+  <data name="Settings.Calendars.Sync.RateLimited" xml:space="preserve"><value>サービスのレート制限中です。</value></data>
+  <data name="Settings.Calendars.Sync.Authentication" xml:space="preserve"><value>認証が必要です。</value></data>
+  <data name="Settings.Calendars.Sync.Permission" xml:space="preserve"><value>このカレンダーを取得する権限がありません。</value></data>
+  <data name="Settings.Calendars.Sync.NotFound" xml:space="preserve"><value>カレンダーが見つかりませんでした。</value></data>
+  <data name="Settings.Calendars.Sync.InvalidData" xml:space="preserve"><value>カレンダーから受信したデータを読み取れませんでした。</value></data>
+  <data name="Settings.Calendars.Sync.Storage" xml:space="preserve"><value>ローカルデータを更新できませんでした。</value></data>
+  <data name="Settings.Calendars.Sync.Unexpected" xml:space="preserve"><value>カレンダーの同期中に問題が発生しました。</value></data>
+  <data name="Settings.Calendars.AllOff" xml:space="preserve"><value>このアカウントには表示するカレンダーがありません。</value></data>
+  <data name="Settings.Calendars.MicrosoftSharedGuidance" xml:space="preserve"><value>共有カレンダーが見つからない場合は、先に Outlook で共有を受諾して予定表一覧へ追加し、その後「一覧を再取得」を選んでください。</value></data>
+  <data name="Settings.Display.Days" xml:space="preserve"><value>表示日数</value></data>
+  <data name="Settings.Display.FontSize" xml:space="preserve"><value>フォントサイズ (DIP)</value></data>
+  <data name="Settings.Display.Density" xml:space="preserve"><value>表示密度</value></data>
+  <data name="Settings.Display.Density.Compact" xml:space="preserve"><value>コンパクト</value></data>
+  <data name="Settings.Display.Density.Standard" xml:space="preserve"><value>標準</value></data>
+  <data name="Settings.Display.Density.Comfortable" xml:space="preserve"><value>ゆったり</value></data>
+  <data name="Settings.Display.DefaultColor" xml:space="preserve"><value>共通デフォルト色</value></data>
+  <data name="Settings.Display.CustomColor" xml:space="preserve"><value>任意の色を選択…</value></data>
+  <data name="Settings.Color.Blue" xml:space="preserve"><value>青（既定）</value></data>
+  <data name="Settings.Color.Teal" xml:space="preserve"><value>ティール</value></data>
+  <data name="Settings.Color.Green" xml:space="preserve"><value>緑</value></data>
+  <data name="Settings.Color.Amber" xml:space="preserve"><value>琥珀</value></data>
+  <data name="Settings.Color.Red" xml:space="preserve"><value>赤</value></data>
+  <data name="Settings.Color.Pink" xml:space="preserve"><value>ピンク</value></data>
+  <data name="Settings.Color.Purple" xml:space="preserve"><value>紫</value></data>
+  <data name="Settings.Color.BlueGray" xml:space="preserve"><value>青灰</value></data>
+  <data name="Settings.ColorRules.Heading" xml:space="preserve"><value>色分けルール</value></data>
+  <data name="Settings.ColorRules.Empty" xml:space="preserve"><value>色分けルールはありません。</value></data>
+  <data name="Settings.ColorRules.Add" xml:space="preserve"><value>追加</value></data>
+  <data name="Settings.ColorRules.NewTitle" xml:space="preserve"><value>色分けルールを追加</value></data>
+  <data name="Settings.ColorRules.EditTitle" xml:space="preserve"><value>色分けルールを編集</value></data>
+  <data name="Settings.ColorRules.Name" xml:space="preserve"><value>ルール名</value></data>
+  <data name="Settings.ColorRules.Enabled" xml:space="preserve"><value>このルールを有効にする</value></data>
+  <data name="Settings.ColorRules.State.Enabled" xml:space="preserve"><value>有効</value></data>
+  <data name="Settings.ColorRules.State.Disabled" xml:space="preserve"><value>無効</value></data>
+  <data name="Settings.ColorRules.Operator" xml:space="preserve"><value>条件の組み合わせ</value></data>
+  <data name="Settings.ColorRules.Operator.All" xml:space="preserve"><value>すべての条件に一致 (AND)</value></data>
+  <data name="Settings.ColorRules.Operator.Any" xml:space="preserve"><value>いずれかの条件に一致 (OR)</value></data>
+  <data name="Settings.ColorRules.Conditions" xml:space="preserve"><value>条件</value></data>
+  <data name="Settings.ColorRules.AddCondition" xml:space="preserve"><value>条件を追加</value></data>
+  <data name="Settings.ColorRules.RemoveCondition" xml:space="preserve"><value>条件を削除</value></data>
+  <data name="Settings.ColorRules.Field.Title" xml:space="preserve"><value>件名</value></data>
+  <data name="Settings.ColorRules.Field.Calendar" xml:space="preserve"><value>カレンダー名</value></data>
+  <data name="Settings.ColorRules.Field.Provider" xml:space="preserve"><value>取得元サービス</value></data>
+  <data name="Settings.ColorRules.Match.Contains" xml:space="preserve"><value>部分一致</value></data>
+  <data name="Settings.ColorRules.Match.Exact" xml:space="preserve"><value>完全一致</value></data>
+  <data name="Settings.ColorRules.CalendarCandidate" xml:space="preserve"><value>現在のカレンダーから選択</value></data>
+  <data name="Settings.ColorRules.ComparisonValue" xml:space="preserve"><value>比較値</value></data>
+  <data name="Settings.ColorRules.Color" xml:space="preserve"><value>色</value></data>
+  <data name="Settings.ColorRules.Preview" xml:space="preserve"><value>プレビュー</value></data>
+  <data name="Settings.ColorRules.Preview.Title" xml:space="preserve"><value>サンプル予定</value></data>
+  <data name="Settings.ColorRules.Preview.Calendar" xml:space="preserve"><value>サンプルカレンダー</value></data>
+  <data name="Settings.ColorRules.Save" xml:space="preserve"><value>保存</value></data>
+  <data name="Settings.ColorRules.Summary.Title.Contains" xml:space="preserve"><value>件名に「{0}」を含む</value></data>
+  <data name="Settings.ColorRules.Summary.Title.Exact" xml:space="preserve"><value>件名が「{0}」と一致</value></data>
+  <data name="Settings.ColorRules.Summary.Calendar.Contains" xml:space="preserve"><value>カレンダー名に「{0}」を含む</value></data>
+  <data name="Settings.ColorRules.Summary.Calendar.Exact" xml:space="preserve"><value>カレンダー名が「{0}」と一致</value></data>
+  <data name="Settings.ColorRules.Summary.Provider" xml:space="preserve"><value>取得元={0}</value></data>
+  <data name="Settings.ColorRules.Summary.Provider.Google" xml:space="preserve"><value>Google</value></data>
+  <data name="Settings.ColorRules.Summary.Provider.Microsoft" xml:space="preserve"><value>Microsoft</value></data>
+  <data name="Settings.ColorRules.Summary.Join.All" xml:space="preserve"><value> AND </value></data>
+  <data name="Settings.ColorRules.Summary.Join.Any" xml:space="preserve"><value> OR </value></data>
+  <data name="Settings.ColorRules.Edit" xml:space="preserve"><value>編集</value></data>
+  <data name="Settings.ColorRules.Delete" xml:space="preserve"><value>削除</value></data>
+  <data name="Settings.ColorRules.MoveUp" xml:space="preserve"><value>上へ</value></data>
+  <data name="Settings.ColorRules.MoveDown" xml:space="preserve"><value>下へ</value></data>
+  <data name="Settings.ColorRules.Enable" xml:space="preserve"><value>有効にする</value></data>
+  <data name="Settings.ColorRules.Disable" xml:space="preserve"><value>無効にする</value></data>
+  <data name="Settings.ColorRules.DeletePrompt" xml:space="preserve"><value>色分けルール「{0}」を削除しますか？</value></data>
+  <data name="Settings.ColorRules.Error.NameRequired" xml:space="preserve"><value>ルール名を入力してください。</value></data>
+  <data name="Settings.ColorRules.Error.NameTooLong" xml:space="preserve"><value>ルール名は{0}文字以内で入力してください。</value></data>
+  <data name="Settings.ColorRules.Error.NameDuplicate" xml:space="preserve"><value>同じ名前のルールがあります。</value></data>
+  <data name="Settings.ColorRules.Error.ConditionRequired" xml:space="preserve"><value>条件を1件以上追加してください。</value></data>
+  <data name="Settings.ColorRules.Error.ComparisonRequired" xml:space="preserve"><value>比較値を入力してください。</value></data>
+  <data name="Settings.Update.Interval" xml:space="preserve"><value>自動更新間隔</value></data>
+  <data name="Settings.Update.IntervalOption" xml:space="preserve"><value>{0} 分</value></data>
+  <data name="Settings.General.StartWithWindows" xml:space="preserve"><value>Windows へのサインイン時に自動起動する</value></data>
+  <data name="Settings.General.ApplicationInfo" xml:space="preserve"><value>アプリ情報</value></data>
+  <data name="Settings.General.ApplicationName" xml:space="preserve"><value>アプリ名: {0}</value></data>
+  <data name="Settings.General.Version" xml:space="preserve"><value>バージョン: {0}</value></data>
+  <data name="Settings.General.BuildTime" xml:space="preserve"><value>ビルド日時: {0:yyyy-MM-dd HH:mm:ss}</value></data>
+  <data name="Settings.General.LocalFiles" xml:space="preserve"><value>ローカルファイル</value></data>
+  <data name="Settings.General.OpenRootDirectory" xml:space="preserve"><value>保存先フォルダを開く</value></data>
+  <data name="Settings.General.OpenSettingsFile" xml:space="preserve"><value>設定ファイルを開く</value></data>
+  <data name="Settings.General.OpenLogsDirectory" xml:space="preserve"><value>ログ保存先フォルダを開く</value></data>
+  <data name="Settings.General.OpenLatestLogFile" xml:space="preserve"><value>最新ログファイルを開く</value></data>
+  <data name="Settings.General.ResetToDefaults" xml:space="preserve"><value>初期設定へ戻す…</value></data>
+  <data name="Settings.Ok" xml:space="preserve"><value>OK</value></data>
+  <data name="Settings.Apply" xml:space="preserve"><value>適用</value></data>
+  <data name="Settings.Cancel" xml:space="preserve"><value>キャンセル</value></data>
+  <data name="Settings.DiscardPrompt" xml:space="preserve"><value>未適用の変更を破棄しますか？</value></data>
+  <data name="Settings.ExitPrompt" xml:space="preserve"><value>未適用の変更を適用して終了しますか？「いいえ」を選ぶと変更を破棄します。</value></data>
+  <data name="Settings.ResetPrompt" xml:space="preserve"><value>表示、更新、一般、色分けルールの設定を初期状態へ戻しますか？アカウントとウィンドウ位置は維持されます。</value></data>
+</root>

@@ -1,0 +1,101 @@
+<UserControl x:Class="UnifiedCalendar.App.Controls.EventDetailsPopup"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:controls="clr-namespace:UnifiedCalendar.App.Controls"
+             xmlns:presentation="clr-namespace:UnifiedCalendar.App.Presentation"
+             MaxWidth="{x:Static presentation:LayoutMetrics.PopupMaximumWidth}"
+             MaxHeight="{x:Static presentation:LayoutMetrics.PopupMaximumHeight}"
+             Focusable="True"
+             IsTabStop="False"
+             KeyboardNavigation.TabNavigation="Cycle"
+             PreviewKeyDown="OnPreviewKeyDown">
+    <UserControl.Resources>
+        <presentation:ValueVisibilityConverter x:Key="ValueVisibility" />
+        <presentation:PopupFontSizeConverter x:Key="PopupFontSize" />
+        <Style x:Key="LabelStyle" TargetType="TextBlock">
+            <Setter Property="Margin" Value="0,10,0,2" />
+            <Setter Property="Foreground" Value="{DynamicResource SecondaryTextBrush}" />
+            <Setter Property="FontSize"
+                    Value="{Binding FontSize, RelativeSource={RelativeSource AncestorType={x:Type controls:EventDetailsPopup}}, Converter={StaticResource PopupFontSize}, ConverterParameter=Label}" />
+        </Style>
+        <Style x:Key="SelectableTextStyle" TargetType="TextBox">
+            <Setter Property="IsReadOnly" Value="True" />
+            <Setter Property="IsTabStop" Value="False" />
+            <Setter Property="TextWrapping" Value="Wrap" />
+            <Setter Property="BorderThickness" Value="0" />
+            <Setter Property="Padding" Value="0" />
+            <Setter Property="Background" Value="Transparent" />
+            <Setter Property="Foreground" Value="{DynamicResource PrimaryTextBrush}" />
+        </Style>
+        <Style x:Key="PopupFocusVisual" TargetType="Control">
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate>
+                        <Border Margin="1"
+                                BorderThickness="{x:Static presentation:LayoutMetrics.FocusBorder}"
+                                BorderBrush="{DynamicResource FocusBrush}" />
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+    </UserControl.Resources>
+    <Border Padding="16"
+            BorderThickness="{x:Static presentation:LayoutMetrics.SeparatorBorder}"
+            BorderBrush="{DynamicResource BorderBrush}"
+            Background="{DynamicResource PanelBackgroundBrush}">
+        <ScrollViewer VerticalScrollBarVisibility="Auto"
+                      HorizontalScrollBarVisibility="Disabled">
+            <StackPanel>
+                <TextBox Style="{StaticResource SelectableTextStyle}"
+                         FontSize="{Binding FontSize, RelativeSource={RelativeSource AncestorType={x:Type controls:EventDetailsPopup}}, Converter={StaticResource PopupFontSize}, ConverterParameter=Title}"
+                         FontWeight="SemiBold"
+                         Text="{Binding Title}" />
+                <TextBox Margin="0,5,0,0"
+                         Style="{StaticResource SelectableTextStyle}"
+                         Text="{Binding DateTime}" />
+
+                <StackPanel Visibility="{Binding Response, Converter={StaticResource ValueVisibility}}">
+                    <TextBlock Style="{StaticResource LabelStyle}" Text="{Binding ResponseLabel}" />
+                    <TextBox Style="{StaticResource SelectableTextStyle}" Text="{Binding Response}" />
+                </StackPanel>
+
+                <StackPanel Visibility="{Binding Location, Converter={StaticResource ValueVisibility}}">
+                    <TextBlock Style="{StaticResource LabelStyle}" Text="{Binding LocationLabel}" />
+                    <controls:SelectableLinkTextBox x:Name="LocationText"
+                                                    Text="{Binding Location}"
+                                                    OpenUriCommand="{Binding OpenContentUriCommand}"
+                                                    Foreground="{DynamicResource PrimaryTextBrush}" />
+                </StackPanel>
+
+                <StackPanel Visibility="{Binding MeetingUri, Converter={StaticResource ValueVisibility}}">
+                    <TextBlock Style="{StaticResource LabelStyle}" Text="{Binding MeetingLabel}" />
+                    <controls:SelectableLinkTextBox x:Name="MeetingText"
+                                                    Text="{Binding MeetingUriText}"
+                                                    OpenUriCommand="{Binding OpenContentUriCommand}"
+                                                    Foreground="{DynamicResource PrimaryTextBrush}" />
+                </StackPanel>
+
+                <StackPanel Visibility="{Binding Description, Converter={StaticResource ValueVisibility}}">
+                    <TextBlock Style="{StaticResource LabelStyle}" Text="{Binding DescriptionLabel}" />
+                    <controls:SelectableLinkTextBox x:Name="DescriptionText"
+                                                    Text="{Binding Description}"
+                                                    OpenUriCommand="{Binding OpenContentUriCommand}"
+                                                    Foreground="{DynamicResource PrimaryTextBrush}" />
+                </StackPanel>
+
+                <Separator Margin="0,14,0,6" />
+                <TextBlock Style="{StaticResource LabelStyle}" Margin="0,0,0,2" Text="{Binding SourceLabel}" />
+                <TextBox Style="{StaticResource SelectableTextStyle}" Text="{Binding Provider}" />
+                <TextBlock Style="{StaticResource LabelStyle}" Text="{Binding CalendarLabel}" />
+                <TextBox Style="{StaticResource SelectableTextStyle}" Text="{Binding CalendarName}" />
+                <Button x:Name="SourceButton"
+                        Margin="0,12,0,0"
+                        HorizontalAlignment="Left"
+                        FocusVisualStyle="{StaticResource PopupFocusVisual}"
+                        Command="{Binding OpenSourceCommand}"
+                        Content="{Binding OpenSourceLabel}"
+                        Visibility="{Binding SourceDetailUri, Converter={StaticResource ValueVisibility}}" />
+            </StackPanel>
+        </ScrollViewer>
+    </Border>
+</UserControl>

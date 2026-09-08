@@ -1,0 +1,13 @@
+{
+  "@odata.context": "https://graph.microsoft.com/v1.0/$metadata#users('fixture')/calendars",
+  "@odata.nextLink": "https://graph.microsoft.com/v1.0/me/calendars?$skiptoken=calendar-page-2",
+  "value": [
+    {
+      "id": "fixture-primary-calendar",
+      "name": "Fixture Primary",
+      "isDefaultCalendar": true,
+      "hexColor": "#123ABC",
+      "color": "lightBlue"
+    }
+  ]
+}

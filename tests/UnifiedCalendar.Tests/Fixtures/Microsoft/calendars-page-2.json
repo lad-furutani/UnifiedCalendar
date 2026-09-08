@@ -1,0 +1,17 @@
+{
+  "@odata.context": "https://graph.microsoft.com/v1.0/$metadata#users('fixture')/calendars",
+  "value": [
+    {
+      "id": "fixture-shared-calendar",
+      "name": "Fixture Shared",
+      "isDefaultCalendar": false,
+      "color": "lightGreen"
+    },
+    {
+      "id": "fixture-subscription-calendar",
+      "name": "Fixture Subscription",
+      "isDefaultCalendar": false,
+      "color": "lightOrange"
+    }
+  ]
+}

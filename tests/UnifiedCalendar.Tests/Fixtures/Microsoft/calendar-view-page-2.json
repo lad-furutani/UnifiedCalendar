@@ -1,0 +1,19 @@
+{
+  "@odata.context": "https://graph.microsoft.com/v1.0/$metadata#users('fixture')/calendars('fixture-primary-calendar')/calendarView",
+  "value": [
+    {
+      "id": "fixture-occurrence",
+      "subject": "Fixture occurrence",
+      "type": "occurrence",
+      "seriesMasterId": "fixture-series",
+      "iCalUId": "fixture-ical-series",
+      "originalStart": "2026-08-30T00:00:00Z",
+      "originalStartTimeZone": "UTC",
+      "start": { "dateTime": "2026-08-30T00:00:00.0000000", "timeZone": "UTC" },
+      "end": { "dateTime": "2026-09-01T00:00:00.0000000", "timeZone": "UTC" },
+      "isAllDay": true,
+      "isCancelled": false,
+      "responseStatus": { "response": "tentativelyAccepted", "time": "2026-08-01T00:00:00Z" }
+    }
+  ]
+}

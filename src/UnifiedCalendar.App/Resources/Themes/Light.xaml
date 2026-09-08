@@ -1,0 +1,24 @@
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:presentation="clr-namespace:UnifiedCalendar.App.Presentation">
+    <SolidColorBrush x:Key="WindowBackgroundBrush" Color="#FFF7F7F7" />
+    <SolidColorBrush x:Key="PanelBackgroundBrush" Color="#FFFFFFFF" />
+    <SolidColorBrush x:Key="PrimaryTextBrush" Color="#FF181818" />
+    <SolidColorBrush x:Key="SecondaryTextBrush" Color="#FF5D5D5D" />
+    <SolidColorBrush x:Key="BorderBrush"
+                     Color="#FF000000"
+                     Opacity="{x:Static presentation:ColorMetrics.SeparatorOpacity}" />
+    <SolidColorBrush x:Key="HeaderBackgroundBrush" Color="#FFF0F0F0" />
+    <SolidColorBrush x:Key="LinkBrush" Color="#FF0F6CBD" />
+    <SolidColorBrush x:Key="FocusBrush" Color="#FF005FB8" />
+    <SolidColorBrush x:Key="FocusForegroundBrush" Color="#FFFFFFFF" />
+    <SolidColorBrush x:Key="ScrollBarTrackBrush" Color="#FFF0F0F0" />
+    <SolidColorBrush x:Key="ScrollBarThumbBrush" Color="#FF7A7A7A" />
+    <SolidColorBrush x:Key="ScrollBarThumbHoverBrush" Color="#FF5D5D5D" />
+    <SolidColorBrush x:Key="ScrollBarGlyphBrush" Color="#FF5D5D5D" />
+    <SolidColorBrush x:Key="ErrorBrush" Color="#FFB42318" />
+    <SolidColorBrush x:Key="ButtonBackgroundBrush" Color="#FFE8E8E8" />
+    <SolidColorBrush x:Key="HoverOverlayBrush"
+                     Color="#FFFFFFFF"
+                     Opacity="{x:Static presentation:ColorMetrics.HoverOpacity}" />
+</ResourceDictionary>

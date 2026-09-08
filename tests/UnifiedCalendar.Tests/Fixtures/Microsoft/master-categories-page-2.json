@@ -1,0 +1,6 @@
+{
+  "@odata.context": "https://graph.microsoft.com/v1.0/$metadata#users('fixture')/outlook/masterCategories",
+  "value": [
+    { "id": "fixture-category-2", "displayName": "Fixture Blue", "color": "preset7" }
+  ]
+}

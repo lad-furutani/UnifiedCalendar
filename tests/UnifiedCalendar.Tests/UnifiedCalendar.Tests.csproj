@@ -1,0 +1,29 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <IsPackable>false</IsPackable>
+    <IsTestProject>true</IsTestProject>
+    <OutputType>Exe</OutputType>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="Microsoft.NET.Test.Sdk" />
+    <PackageReference Include="Microsoft.Graph" />
+    <PackageReference Include="Microsoft.Identity.Client" />
+    <PackageReference Include="NSubstitute" />
+    <PackageReference Include="xunit.v3" />
+    <PackageReference Include="xunit.runner.visualstudio">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Fixtures\Google\*.json" />
+    <EmbeddedResource Include="Fixtures\Microsoft\*.json" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\UnifiedCalendar.App\UnifiedCalendar.App.csproj" />
+    <ProjectReference Include="..\..\src\UnifiedCalendar.Core\UnifiedCalendar.Core.csproj" />
+    <ProjectReference Include="..\..\src\UnifiedCalendar.Infrastructure\UnifiedCalendar.Infrastructure.csproj" />
+    <ProjectReference Include="..\..\src\UnifiedCalendar.Providers.Google\UnifiedCalendar.Providers.Google.csproj" />
+    <ProjectReference Include="..\..\src\UnifiedCalendar.Providers.Microsoft\UnifiedCalendar.Providers.Microsoft.csproj" />
+  </ItemGroup>
+</Project>
