@@ -414,7 +414,47 @@ Phase 8 の着手前に、持ち越しのうち判断を要する事項を決定
 | --- | --- | --- |
 | 1 | ~~**ACC-008 の体感評価**~~。**完了。** Phase 6 でリモートデスクトップのため保留、Phase 7b / 7d でも未実施だったものを `acceptance-phase8.md` C 章で実施し合格。表示日数90日で実データを増やして確認した。**TBD-018 はこれで閉じる。** ただし件数と体感待ち時間の実数値は記録していない | `acceptance-phase7b.md` 付録B-5 |
 | 2 | ~~**ログオン時自動起動（H-5）**~~。**完了。** サインアウト／サインインを伴うため3フェーズ持ち越されていたものを `acceptance-phase8.md` F 章で実施し合格。**インストール先が変わってもアプリが起動時にパスを修正することも確認した** | `acceptance-phase7a.md` 付録B-3 |
-| 3 | ~~**間欠的なテスト失敗**~~。**完了（Phase 8-2 D84 / D85）。** 原因のテスト1件と同型の8件を是正し、修正後に `dotnet test -c Release` を Codex 20回・Work 22回繰り返して失敗0件を確認した。当初は単発 `PumpDispatcher()` が原因と見ていたが、Phase 8-2 のレビューで再現した1件（`MainWindowViewModelTests.InternalMinuteRefreshReprojectsWithoutCallingAProvider`、18回中2回）は `PumpDispatcher` を一切使っておらず、**`WaitUntilAsync` の待機条件がアサーション対象と異なる**ことが原因だった。原因の分類を「待つ条件と検証する条件の不一致」へ改める | `acceptance-phase7d.md` 付録B-2、`handoff-phase8-2-remediation.md` D84 |
+| 3 | ~~**間欠的なテスト失敗**~~。**完了（Phase 8-2 D84 / D85）。** 原因のテスト1件と同型の8件を是正し、修正後に `dotnet test -c Release` を Codex 20回・Work 22回繰り返して失敗0件を確認した。当初は単発 `PumpDispatcher()` が原因と見ていたが、Phase 8-2 のレビューで再現した1件（`MainWindowViewModelTests.InternalMinuteRefreshReprojectsWithoutCallingAProvider`、18回中2回）は `PumpDispatcher` を一切使っておらず、**`WaitUntilAsync` の待機条件がアサーション対象と異なる**ことが原因だった。原因の分類を「待つ条件と検証する条件の不一致」へ改める。**ただしこの「失敗0件」は実行順に依存した偶然であり、出荷後に同型の不具合が3種見つかった（後述「テストの『全件合格』が偶然だった件」、D111〜D116）。** | `acceptance-phase7d.md` 付録B-2、`handoff-phase8-2-remediation.md` D84 |
 | 4 | ~~**レビューで【軽微】とした各件**~~。**完了。** `SystemLocalTimeZoneProvider` / `FixedLocalTimeZoneProvider` を Core へ集約、`ToCalendarAccount` を Core の拡張メソッドへ集約、保存失敗時のチェック表示を是正（Phase 8-2 D80 / D81 / D83）。`ToCalendarAccount` の引数チェックも追加（D86）。**据え置くと決めた6項目は 8-2 指示書の「やらないこと」に理由つきで記録済み** | 各 handoff のレビュー結果 |
 | 5 | ~~**クライアント資格情報の配布方式の実装**~~。**Phase 8-1 で完了（2026-09-07）。** 以下は当初の記述。方式は 8.7 で決定済み（ビルド時にアセンブリへ埋め込み、環境変数で上書き。既定は空でビルド可能）。`build.ps1` からの値の受け渡し、解決順序と Google の ClientId/Secret 組ルールを閉じたクラス、解決元のログ出力、installer 経由での認証確認を実装する。Phase 8 の DoD「win-x64 self-contained installer で新規install/upgrade/uninstallを確認する」の前提条件になる | `08-oauth-and-token-storage.md` 8.7 |
 | 6 | ~~**メイン画面とポップアップのダークモード実機確認**~~。**完了。** `acceptance-phase8.md` D 章で実施し合格。**詳細ポップアップの区切り線は実機で問題とならなかったため、決定どおり手を入れない。** トレイアイコンの16px表示も同章で確認した | `handoff-main-window-theme.md` |
+
+## 1.0.0 出荷後の記録（2026-09-08）
+
+出荷後に行った作業を記録する。**製品の機能は変えていない。**
+
+| 作業 | 内容 | 指示書 |
+| --- | --- | --- |
+| ソース公開 | Apache-2.0 でソースのみを公開し、リポジトリを公開／非公開／凍結の3つへ分けた | `handoff-oss-publication.md`（D103〜D108）、`handoff-publication-script-encoding.md`（D109 / D110） |
+| テストの安定化 | 実行順に依存していたテスト1件と、待機の不備3種を是正した | `handoff-test-isolation-theme-resource.md`（D111 / D112）、`handoff-test-wait-signal-mismatch.md`（D113 / D114）、`handoff-test-wait-timeout.md`（D115 / D116） |
+| インストーラの使用許諾 | `docs/terms.md` から生成した利用規約を Setup の EULA として表示した | `handoff-installer-eula.md`（D117〜D119） |
+
+**ライセンスと公開範囲の決定は 18章 18.2。** リポジトリ3構成とその理由もそこにある。
+
+**公開用スクリプトの文字化けから分かったこと。** Windows PowerShell 5.1 は **BOM の無い `.ps1` を ANSI（CP932）として読む。** 日本語のリテラルを含むスクリプトは **UTF-8 BOM 付きで保存しなければならない。** また .NET Framework 上で動くため `Path.GetRelativePath` が無い。**この2点は今後 PowerShell スクリプトを追加するときの前提である。**
+
+### テストの「全件合格」が偶然だった件
+
+**出荷判断までに繰り返し確認していた「507/507 合格」は、実行順に依存した偶然だった。** `Phase7bRemediationTests` の1件は、**別のテストがテーマ辞書を共有の `Application.Resources` へ残していったときだけ通っていた。** エディタのビルドホストを終了させて実行順が変わったことで表面化した。**持ち越し3件目の「失敗0件を確認した」という結論は、この範囲では正しくなかった。**
+
+続けて、待機の不備が3種見つかった。
+
+| 分類 | 内容 | 決定 |
+| --- | --- | --- |
+| 他のテストの副作用に依存 | 共有の `Application.Resources` に依存していた。**対象ウィンドウ内へテーマ辞書を入れて自己完結させた** | D111 |
+| 待つ信号と検証する状態の不一致 | `ApplyPresentation` の**1行目で完了する信号**を待って、**最終行で決まる状態**を検証していた | D113 |
+| 待機が無期限 | 条件が成立しないとテストが終わらず、**何を待っていたのか分からない** | D115 / D116 |
+
+**待機の仕組みは3系統（`WaitUntilAsync` / `PumpDispatcherUntil` / `TaskCompletionSource`）あり、97箇所を点検して9箇所を是正した。** D84 の是正が `WaitUntilAsync` の22箇所しか見ていなかったのは**指示側の範囲設定の漏れである。**
+
+### インストーラの使用許諾（D117〜D119）
+
+`LicenseFile` で表示する。**`docs/terms.md` から `artifacts\installer-input\TERMS.txt` を生成する**（Inno Setup が平文・CRLF・UTF-8 BOM を要求するため、front matter と Markdown 記法を落として変換する）。**規約の原本を1つに保つ**ため、公開ページ（GitHub Pages）とインストーラは同じ `docs/terms.md` を出所とする。生成物は `{app}` へも同梱する。**同意しなければインストールを続行できない。** 実機で、表示されること・文字化けが無いこと・段落が繋がらないこと・`{app}` に同梱されることを確認した。
+
+### 出荷後に残る事項
+
+- **Google の公開ステータス切り替え（2026-09-08）で7日ごとの再認証が解けたことの実測。** **2026-09-15 以降**に再認証を求められないことを確認する。それまで 8.6 の記述は見込みである。
+
+- **`build-installer.ps1 -NoSign` は署名済みインストーラを同名で黙って上書きする。** 実際に一度上書きした。出力ファイル名を分ける案は採らず、**配布前に必ず `build.ps1` → `build-installer.ps1`（既定で署名する）を通す手順で担保する。**
+
+- **資格情報の環境変数名の綴り違いは検出できない。** `UnifiedCalendar__Google_ClientSecret`（アンダースコア1つ）と書いた事故が起きたが、D98 の歯止めは**不在を警告するだけで、近い名前の存在を指摘できない。** 綴り違いの検知と、資格情報をファイルから読む `build-release.ps1` は**保留とした。**
