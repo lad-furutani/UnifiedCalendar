@@ -30,6 +30,7 @@
   <data name="Status.LastUpdateUnavailable" xml:space="preserve"><value>最終更新 --</value></data>
   <data name="Status.Updating" xml:space="preserve"><value>更新中</value></data>
   <data name="Status.ManualRefresh" xml:space="preserve"><value>今すぐ更新</value></data>
+  <data name="Status.Settings" xml:space="preserve"><value>設定</value></data>
   <data name="State.Empty" xml:space="preserve"><value>今後{0}日間の予定はありません</value></data>
   <data name="State.Loading" xml:space="preserve"><value>予定を取得中…</value></data>
   <data name="State.Unregistered" xml:space="preserve"><value>アカウントを追加してください</value></data>

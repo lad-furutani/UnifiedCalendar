@@ -300,7 +300,8 @@ internal static class Phase6Data
         RecordingAccountInteractionService? interactions = null,
         RecordingUriLauncher? uriLauncher = null,
         InternalRefreshSignal? refreshSignal = null,
-        IApplicationSettingsService? settingsService = null)
+        IApplicationSettingsService? settingsService = null,
+        ISettingsWindowLauncher? settingsLauncher = null)
     {
         settings ??= new TestSettingsStore();
         dispatcher ??= new ImmediateUiDispatcher();
@@ -321,7 +322,8 @@ internal static class Phase6Data
             new SnapshotDiffer(),
             viewport,
             timeProvider,
-            TimeZoneInfo.Utc);
+            TimeZoneInfo.Utc,
+            settingsLauncher);
     }
 
     public static async Task WaitUntilAsync(

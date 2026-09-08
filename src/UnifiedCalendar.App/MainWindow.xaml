@@ -171,6 +171,7 @@
                     <ColumnDefinition Width="Auto" />
                     <ColumnDefinition Width="*" />
                     <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="Auto" />
                 </Grid.ColumnDefinitions>
                 <TextBlock Grid.Column="0"
                            Margin="0,0,16,0"
@@ -248,6 +249,18 @@
                           StrokeThickness="3"
                           Data="M 13,3 A 10,10 0 0 1 23,13" />
                 </Grid>
+                <Button x:Name="SettingsButton"
+                        Grid.Column="4"
+                        Width="32"
+                        Height="{Binding WarningButtonHeight}"
+                        VerticalAlignment="Center"
+                        AutomationProperties.Name="{Binding SettingsText}"
+                        FontFamily="Segoe MDL2 Assets"
+                        FontSize="14"
+                        KeyboardNavigation.TabIndex="1"
+                        Command="{Binding OpenSettingsCommand}"
+                        Content="&#xE713;"
+                        ToolTip="{Binding SettingsText}" />
             </Grid>
         </Border>
 
@@ -265,7 +278,7 @@
                          VirtualizingPanel.VirtualizationMode="Recycling"
                          VirtualizingPanel.ScrollUnit="Pixel"
                          KeyboardNavigation.TabNavigation="Continue"
-                         KeyboardNavigation.TabIndex="1"
+                         KeyboardNavigation.TabIndex="2"
                          PreviewKeyDown="TimelinePreviewKeyDown"
                          LostMouseCapture="TimelineListLostMouseCapture"
                          SizeChanged="TimelineListSizeChanged"
@@ -314,16 +327,18 @@
                            Text="{Binding AccountOperationMessage}"
                            TextWrapping="Wrap"
                            Visibility="{Binding AccountOperationMessage, Converter={StaticResource ValueVisibility}}" />
-                <Button Margin="0,14,0,0"
+                <Button x:Name="AddGoogleAccountButton"
+                        Margin="0,14,0,0"
                         Padding="12,6"
-                        KeyboardNavigation.TabIndex="1"
+                        KeyboardNavigation.TabIndex="3"
                         Command="{Binding AddGoogleAccountCommand}"
                         Content="{Binding AddGoogleAccountText}"
                         ToolTip="{Binding AddGoogleAccountToolTip}"
                         ToolTipService.ShowOnDisabled="True" />
-                <Button Margin="0,8,0,0"
+                <Button x:Name="AddMicrosoftAccountButton"
+                        Margin="0,8,0,0"
                         Padding="12,6"
-                        KeyboardNavigation.TabIndex="2"
+                        KeyboardNavigation.TabIndex="4"
                         Command="{Binding AddMicrosoftAccountCommand}"
                         Content="{Binding AddMicrosoftAccountText}"
                         ToolTip="{Binding AddMicrosoftAccountToolTip}"

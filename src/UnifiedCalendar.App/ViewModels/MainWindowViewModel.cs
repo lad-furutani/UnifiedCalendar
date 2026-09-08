@@ -38,6 +38,7 @@ public sealed partial class MainWindowViewModel : ObservableObject, IDisposable
     private readonly ITimelineViewport _viewport;
     private readonly TimeProvider _timeProvider;
     private readonly ILocalTimeZoneProvider _localTimeZoneProvider;
+    private readonly ISettingsWindowLauncher _settingsLauncher;
     private readonly SemaphoreSlim _applySemaphore = new(1, 1);
     private readonly CancellationTokenSource _lifetimeCancellation = new();
     private AppSettings _settings = AppSettings.CreateDefault();
@@ -59,7 +60,8 @@ public sealed partial class MainWindowViewModel : ObservableObject, IDisposable
         SnapshotDiffer snapshotDiffer,
         ITimelineViewport viewport,
         TimeProvider timeProvider,
-        TimeZoneInfo localTimeZone)
+        TimeZoneInfo localTimeZone,
+        ISettingsWindowLauncher? settingsLauncher = null)
         : this(
             syncService,
             refreshSignal,
@@ -74,7 +76,8 @@ public sealed partial class MainWindowViewModel : ObservableObject, IDisposable
             snapshotDiffer,
             viewport,
             timeProvider,
-            new FixedLocalTimeZoneProvider(localTimeZone))
+            new FixedLocalTimeZoneProvider(localTimeZone),
+            settingsLauncher)
     {
     }
 
@@ -92,7 +95,8 @@ public sealed partial class MainWindowViewModel : ObservableObject, IDisposable
         SnapshotDiffer snapshotDiffer,
         ITimelineViewport viewport,
         TimeProvider timeProvider,
-        ILocalTimeZoneProvider localTimeZoneProvider)
+        ILocalTimeZoneProvider localTimeZoneProvider,
+        ISettingsWindowLauncher? settingsLauncher = null)
     {
         _syncService = syncService ?? throw new ArgumentNullException(nameof(syncService));
         _refreshSignal = refreshSignal ?? throw new ArgumentNullException(nameof(refreshSignal));
@@ -110,8 +114,12 @@ public sealed partial class MainWindowViewModel : ObservableObject, IDisposable
         _timeProvider = timeProvider ?? throw new ArgumentNullException(nameof(timeProvider));
         _localTimeZoneProvider = localTimeZoneProvider
             ?? throw new ArgumentNullException(nameof(localTimeZoneProvider));
+        _settingsLauncher = settingsLauncher ?? new UnavailableSettingsWindowLauncher();
 
         ManualRefreshCommand = new AsyncRelayCommand(ManualRefreshAsync, () => !IsSyncing);
+        OpenSettingsCommand = new RelayCommand(
+            OpenSettings,
+            () => _settingsLauncher.IsAvailable);
         AddGoogleAccountCommand = new AsyncRelayCommand(
             cancellationToken => AddAccountAsync(ProviderKind.Google, cancellationToken),
             () => _registrationService.IsProviderAvailable(ProviderKind.Google));
@@ -140,6 +148,8 @@ public sealed partial class MainWindowViewModel : ObservableObject, IDisposable
 
     public IAsyncRelayCommand ManualRefreshCommand { get; }
 
+    public IRelayCommand OpenSettingsCommand { get; }
+
     public IAsyncRelayCommand AddGoogleAccountCommand { get; }
 
     public IAsyncRelayCommand AddMicrosoftAccountCommand { get; }
@@ -164,6 +174,9 @@ public sealed partial class MainWindowViewModel : ObservableObject, IDisposable
 
     [ObservableProperty]
     private string _updatingText = string.Empty;
+
+    [ObservableProperty]
+    private string _settingsText = string.Empty;
 
     [ObservableProperty]
     private string _addGoogleAccountText = string.Empty;
@@ -351,6 +364,21 @@ public sealed partial class MainWindowViewModel : ObservableObject, IDisposable
                 UpdateStatus(_syncService.CurrentSnapshot);
                 return Task.CompletedTask;
             }).ConfigureAwait(false);
+        }
+    }
+
+    private void OpenSettings()
+    {
+        try
+        {
+            _settingsLauncher.Show();
+        }
+        catch (Exception exception)
+        {
+            Log.Warning(
+                "MainWindowActionFailed {Stage} {ErrorCategory}",
+                "Settings",
+                exception.GetType().Name);
         }
     }
 
@@ -623,6 +651,7 @@ public sealed partial class MainWindowViewModel : ObservableObject, IDisposable
         CurrentTimeText = _textService.Get(UiResourceKeys.CurrentTime, localNow);
         ManualRefreshText = _textService.Get(UiResourceKeys.ManualRefresh);
         UpdatingText = _textService.Get(UiResourceKeys.Updating);
+        SettingsText = _textService.Get(UiResourceKeys.StatusSettings);
         AddGoogleAccountText = _textService.Get(UiResourceKeys.AddGoogleAccount);
         AddMicrosoftAccountText = _textService.Get(UiResourceKeys.AddMicrosoftAccount);
     }

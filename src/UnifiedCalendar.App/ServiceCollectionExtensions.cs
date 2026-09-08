@@ -145,7 +145,8 @@ public static class ServiceCollectionExtensions
             provider.GetRequiredService<SnapshotDiffer>(),
             provider.GetRequiredService<ITimelineViewport>(),
             provider.GetRequiredService<TimeProvider>(),
-            provider.GetRequiredService<ILocalTimeZoneProvider>()));
+            provider.GetRequiredService<ILocalTimeZoneProvider>(),
+            provider.GetRequiredService<ISettingsWindowLauncher>()));
         services.AddSingleton<MainWindow>();
 
         if (credentials.Google is not null)

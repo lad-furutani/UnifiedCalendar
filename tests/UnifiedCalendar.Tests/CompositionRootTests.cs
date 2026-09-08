@@ -2,6 +2,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using UnifiedCalendar.App;
 using UnifiedCalendar.App.Services;
+using UnifiedCalendar.App.Shell;
 using UnifiedCalendar.App.Sync;
 using UnifiedCalendar.App.ViewModels;
 using UnifiedCalendar.Core.Models;
@@ -138,5 +139,32 @@ public sealed class CompositionRootTests
 
         using var provider = services.BuildServiceProvider();
         Assert.Null(provider.GetService<ISyncEventLogger>());
+    }
+}
+
+[Collection(WpfApplicationCollection.Name)]
+public sealed class CompositionRootWpfTests
+{
+    private readonly WpfApplicationFixture _fixture;
+
+    public CompositionRootWpfTests(WpfApplicationFixture fixture)
+    {
+        _fixture = fixture;
+    }
+
+    [Fact]
+    public void MainWindowSettingsComponents_CanBeResolvedTogether()
+    {
+        _fixture.Invoke(() =>
+        {
+            var services = new ServiceCollection();
+            services.AddUnifiedCalendarApplication();
+            using var provider = services.BuildServiceProvider();
+
+            Assert.IsType<MainWindowViewModel>(
+                provider.GetRequiredService<MainWindowViewModel>());
+            Assert.IsType<MainWindow>(provider.GetRequiredService<MainWindow>());
+            Assert.IsType<TrayIconService>(provider.GetRequiredService<TrayIconService>());
+        });
     }
 }

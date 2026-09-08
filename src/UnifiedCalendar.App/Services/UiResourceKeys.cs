@@ -8,6 +8,7 @@ public static class UiResourceKeys
     public const string LastUpdateUnavailable = "Status.LastUpdateUnavailable";
     public const string Updating = "Status.Updating";
     public const string ManualRefresh = "Status.ManualRefresh";
+    public const string StatusSettings = "Status.Settings";
     public const string Empty = "State.Empty";
     public const string Loading = "State.Loading";
     public const string Unregistered = "State.Unregistered";
