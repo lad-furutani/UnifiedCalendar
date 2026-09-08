@@ -330,6 +330,19 @@ public sealed class Phase8InstallerTests
             "Source: \"..\\THIRD-PARTY-NOTICES.txt\"; DestDir: \"{app}\"; Flags: ignoreversion",
             thirdPartyNoticesSource.TrimEnd('\r'));
         Assert.DoesNotContain("signonce", thirdPartyNoticesSource, StringComparison.OrdinalIgnoreCase);
+        Assert.Contains(
+            "#define InstallerLicensePath AddBackslash(SourcePath) + \"..\\artifacts\\installer-input\\TERMS.txt\"",
+            installer);
+        Assert.Contains("LicenseFile={#InstallerLicensePath}", installer);
+        var installerLicenseSource = Assert.Single(
+            installer.Split('\n'),
+            line => line.Contains(
+                "Source: \"{#InstallerLicensePath}\"",
+                StringComparison.Ordinal));
+        Assert.Equal(
+            "Source: \"{#InstallerLicensePath}\"; DestDir: \"{app}\"; Flags: ignoreversion",
+            installerLicenseSource.TrimEnd('\r'));
+        Assert.DoesNotContain("signonce", installerLicenseSource, StringComparison.OrdinalIgnoreCase);
         Assert.Equal(2, CountOccurrences(installer, "signonce"));
         Assert.DoesNotContain("{#PublishDir}\\*\"; DestDir: \"{app}\"; Flags: ignoreversion recursesubdirs createallsubdirs signonce", installer);
         Assert.DoesNotContain("UnifiedCalendar.App.exe\"; DestDir", installer);
@@ -349,7 +362,7 @@ public sealed class Phase8InstallerTests
         Assert.DoesNotMatch(@"(?m)^\s*AppMutex\s*=", installer);
         Assert.Contains("uninsdeletevalue", installer);
         Assert.DoesNotContain("[UninstallDelete]", installer);
-        Assert.DoesNotMatch(@"(?m)^\s*LicenseFile\s*=", installer);
+        Assert.Matches(@"(?m)^\s*LicenseFile=\{#InstallerLicensePath\}\s*$", installer);
         Assert.Contains("{autoprograms}\\{#AppName}", installer);
         Assert.DoesNotContain("{userdesktop}", installer);
         Assert.Contains("#ifdef SIGN", installer);
@@ -378,6 +391,40 @@ public sealed class Phase8InstallerTests
         Assert.Contains("Missing embedded client credentials were explicitly allowed", buildInstaller);
         Assert.Contains("Credential build metadata was not found", buildInstaller);
         Assert.DoesNotContain("$env:", buildInstaller, StringComparison.OrdinalIgnoreCase);
+        Assert.Contains("docs\\terms.md", buildInstaller);
+        Assert.Contains("artifacts\\installer-input", buildInstaller);
+        Assert.Contains("$plainTextLines -join \"`r`n\"", buildInstaller);
+        Assert.Contains("New-Object Text.UTF8Encoding($true)", buildInstaller);
+        Assert.Contains(
+            "[string]::IsNullOrWhiteSpace($termsLines[$contentStart])",
+            buildInstaller);
+        Assert.Contains(
+            "$termsLines[$contentStart..($termsLines.Count - 1)]",
+            buildInstaller);
+        Assert.Contains(
+            "docs/terms.md has no content after YAML front matter.",
+            buildInstaller);
+        Assert.Contains("-replace '^#{1,2} ', ''", buildInstaller);
+        Assert.Contains("-replace '\\*\\*', ''", buildInstaller);
+        Assert.Contains("-replace '`', ''", buildInstaller);
+        Assert.DoesNotContain("artifacts\\publish\\win-x64\\TERMS.txt", buildInstaller);
+        var licenseWriteIndex = buildInstaller.IndexOf(
+            "[IO.File]::WriteAllText",
+            StringComparison.Ordinal);
+        var isccInvokeIndex = buildInstaller.IndexOf(
+            "& $IsccPath @arguments",
+            StringComparison.Ordinal);
+        Assert.True(licenseWriteIndex >= 0);
+        Assert.True(isccInvokeIndex >= 0);
+        Assert.True(licenseWriteIndex < isccInvokeIndex);
+        var terms = File.ReadAllText(Path.Combine(root, "docs", "terms.md"));
+        Assert.Contains("インストール時に本規約へ同意することで、本規約が適用されます。", terms);
+        Assert.Contains("同意しない場合は、インストールを中止してください。", terms);
+        Assert.Contains("公開ページへの掲載または変更後のインストーラの配布をもって適用されます。", terms);
+        Assert.DoesNotContain("本ページ", terms);
+        Assert.DoesNotContain(
+            Directory.EnumerateFiles(root, "TERMS.txt", SearchOption.AllDirectories),
+            path => !IsGeneratedPath(root, path));
         Assert.Contains("artifacts\\build-metadata\\win-x64-client-credentials.json", regularBuild);
         Assert.DoesNotContain(
             "artifacts\\publish\\win-x64\\win-x64-client-credentials.json",

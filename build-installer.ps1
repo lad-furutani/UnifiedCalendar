@@ -14,6 +14,9 @@ $ErrorActionPreference = 'Stop'
 $installerScriptPath = Join-Path $PSScriptRoot 'installer\UnifiedCalendar.iss'
 $publishedExecutablePath = Join-Path $PSScriptRoot 'artifacts\publish\win-x64\UnifiedCalendar.App.exe'
 $installerOutputPath = Join-Path $PSScriptRoot 'artifacts\installer'
+$termsMarkdownPath = Join-Path $PSScriptRoot 'docs\terms.md'
+$installerInputPath = Join-Path $PSScriptRoot 'artifacts\installer-input'
+$installerLicensePath = Join-Path $installerInputPath 'TERMS.txt'
 $buildMetadataPath = Join-Path $PSScriptRoot 'artifacts\build-metadata\win-x64-client-credentials.json'
 
 if (-not (Test-Path -LiteralPath $publishedExecutablePath -PathType Leaf)) {
@@ -97,6 +100,49 @@ if (-not $NoSign) {
 else {
     Write-Warning 'Code signing is disabled. No signatures will be added to the installer or bundled application binaries.'
 }
+
+$termsMarkdown = Get-Content -LiteralPath $termsMarkdownPath -Raw -Encoding UTF8
+$normalizedTerms = $termsMarkdown -replace "`r`n?", "`n"
+$termsLines = $normalizedTerms -split "`n"
+if ($termsLines.Count -lt 3 -or $termsLines[0] -ne '---') {
+    throw 'docs/terms.md must start with YAML front matter.'
+}
+
+$frontMatterEnd = -1
+for ($index = 1; $index -lt $termsLines.Count; $index++) {
+    if ($termsLines[$index] -eq '---') {
+        $frontMatterEnd = $index
+        break
+    }
+}
+if ($frontMatterEnd -lt 0) {
+    throw 'docs/terms.md YAML front matter is not closed.'
+}
+
+$contentStart = $frontMatterEnd + 1
+while ($contentStart -lt $termsLines.Count -and [string]::IsNullOrWhiteSpace($termsLines[$contentStart])) {
+    $contentStart++
+}
+if ($contentStart -ge $termsLines.Count) {
+    throw 'docs/terms.md has no content after YAML front matter.'
+}
+
+$plainTextLines = foreach ($line in $termsLines[$contentStart..($termsLines.Count - 1)]) {
+    if ($line -eq '---') {
+        continue
+    }
+
+    $line `
+        -replace '^#{1,2} ', '' `
+        -replace '\*\*', '' `
+        -replace '`', ''
+}
+$plainTextTerms = $plainTextLines -join "`r`n"
+[IO.Directory]::CreateDirectory($installerInputPath) | Out-Null
+[IO.File]::WriteAllText(
+    $installerLicensePath,
+    $plainTextTerms,
+    (New-Object Text.UTF8Encoding($true)))
 
 $arguments += $installerScriptPath
 & $IsccPath @arguments

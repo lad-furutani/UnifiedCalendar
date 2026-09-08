@@ -6,6 +6,7 @@
 #define PublishDir AddBackslash(SourcePath) + "..\artifacts\publish\win-x64"
 #define AppExePath AddBackslash(PublishDir) + AppExeName
 #define InstallerOutputDir AddBackslash(SourcePath) + "..\artifacts\installer"
+#define InstallerLicensePath AddBackslash(SourcePath) + "..\artifacts\installer-input\TERMS.txt"
 
 #if !FileExists(AppExePath)
   #error "Published application not found. Run build.ps1 before building the installer."
@@ -39,6 +40,7 @@ CloseApplications=yes
 CloseApplicationsFilter={#AppExeName}
 RestartApplications=no
 VersionInfoVersion={#NumericAppVersion}
+LicenseFile={#InstallerLicensePath}
 
 #ifdef SIGN
 SignTool=MySignTool
@@ -51,6 +53,7 @@ Name: "japanese"; MessagesFile: "compiler:Languages\Japanese.isl"
 
 [Files]
 Source: "..\THIRD-PARTY-NOTICES.txt"; DestDir: "{app}"; Flags: ignoreversion
+Source: "{#InstallerLicensePath}"; DestDir: "{app}"; Flags: ignoreversion
 ; Keep non-PE payloads in the package without passing them to SignTool.
 Source: "{#PublishDir}\*"; DestDir: "{app}"; Excludes: "*.exe,*.dll"; Flags: ignoreversion recursesubdirs createallsubdirs
 Source: "{#PublishDir}\*.exe"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs signonce
