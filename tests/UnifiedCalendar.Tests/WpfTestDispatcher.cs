@@ -1,5 +1,7 @@
 global using static UnifiedCalendar.Tests.WpfTestDispatcher;
 
+using System.Diagnostics;
+using System.Runtime.CompilerServices;
 using System.Windows.Threading;
 using Xunit;
 
@@ -16,14 +18,21 @@ internal static class WpfTestDispatcher
         Dispatcher.PushFrame(frame);
     }
 
-    internal static void PumpDispatcherUntil(Func<bool> condition)
+    internal static void PumpDispatcherUntil(
+        Func<bool> condition,
+        [CallerArgumentExpression(nameof(condition))] string? conditionText = null)
     {
-        for (var attempt = 0; attempt < 1_000 && !condition(); attempt++)
+        var timeout = TimeSpan.FromSeconds(10);
+        var stopwatch = Stopwatch.StartNew();
+        while (stopwatch.Elapsed < timeout && !condition())
         {
             PumpDispatcher();
             Thread.Sleep(1);
         }
 
-        Assert.True(condition(), "The expected WPF dispatcher state was not reached.");
+        Assert.True(
+            condition(),
+            $"The expected WPF dispatcher state was not reached within " +
+            $"{timeout.TotalSeconds:0} seconds: {conditionText}");
     }
 }

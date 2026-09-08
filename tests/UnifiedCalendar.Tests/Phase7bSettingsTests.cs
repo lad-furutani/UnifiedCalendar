@@ -154,6 +154,8 @@ public sealed class Phase7bSettingsTests
         await displayProjectionCompleted.Task.WaitAsync(
             TimeSpan.FromSeconds(5),
             TestContext.Current.CancellationToken);
+        await Phase6Data.WaitUntilAsync(
+            () => viewport.Restorations.Count == initialProjectionCount + 1);
 
         Assert.Equal(SettingsSection.Windows | SettingsSection.Display, notifiedSections);
         Assert.Equal(initialProjectionCount + 1, viewport.Restorations.Count);

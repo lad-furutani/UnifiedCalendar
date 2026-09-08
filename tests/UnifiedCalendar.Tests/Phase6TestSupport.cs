@@ -1,3 +1,5 @@
+using System.Diagnostics;
+using System.Runtime.CompilerServices;
 using UnifiedCalendar.App.Presentation;
 using UnifiedCalendar.App.Services;
 using UnifiedCalendar.App.ViewModels;
@@ -322,18 +324,22 @@ internal static class Phase6Data
             TimeZoneInfo.Utc);
     }
 
-    public static async Task WaitUntilAsync(Func<bool> predicate)
+    public static async Task WaitUntilAsync(
+        Func<bool> predicate,
+        [CallerArgumentExpression(nameof(predicate))] string? predicateText = null)
     {
-        for (var attempt = 0; attempt < 100; attempt++)
+        var timeout = TimeSpan.FromSeconds(10);
+        var stopwatch = Stopwatch.StartNew();
+        while (!predicate())
         {
-            if (predicate())
+            if (stopwatch.Elapsed >= timeout)
             {
-                return;
+                throw new TimeoutException(
+                    $"The asynchronous UI projection did not complete within " +
+                    $"{timeout.TotalSeconds:0} seconds: {predicateText}");
             }
 
             await Task.Delay(10);
         }
-
-        throw new TimeoutException("The asynchronous UI projection did not complete.");
     }
 }

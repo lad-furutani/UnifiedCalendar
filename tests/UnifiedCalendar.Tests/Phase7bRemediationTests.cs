@@ -184,6 +184,12 @@ public sealed class Phase7bRemediationTests
         _fixture.Invoke(() =>
         {
             var (owner, window, viewModel) = CreateSettingsWindow();
+            window.Resources.MergedDictionaries.Add(new ResourceDictionary
+            {
+                Source = new Uri(
+                    "/UnifiedCalendar.App;component/Resources/Themes/Light.xaml",
+                    UriKind.Relative),
+            });
             viewModel.SelectedCategory = viewModel.Categories.Single(category => category.Key == "display");
             window.Show();
             PumpDispatcher();
