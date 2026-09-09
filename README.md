@@ -2,7 +2,7 @@
 
 Google Calendar と Microsoft 365 の予定を、Windows 上の1つの時系列へまとめて表示する参照専用デスクトップアプリです。複数アカウント・複数カレンダーに対応し、タスクトレイに常駐して予定を定期的に更新します。
 
-現在のリリース: **1.1.0**
+現在のリリース: **1.2.0**
 
 ## 主な機能
 
@@ -125,7 +125,7 @@ Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass
 .\build-installer.ps1 -NoSign -AllowMissingCredentials
 ```
 
-生成先は `artifacts\installer\UnifiedCalendar-Setup-1.1.0.exe` です。インストーラはユーザー単位でインストールされ、管理者権限を必要としません。
+生成先は `artifacts\installer\UnifiedCalendar-Setup-1.2.0.exe` です。インストーラはユーザー単位でインストールされ、管理者権限を必要としません。
 
 ## データとプライバシー
 

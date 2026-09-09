@@ -40,9 +40,9 @@ public sealed class Phase8InstallerTests
         Assert.Equal(
             "Google と Microsoft 365 の予定を1つの時系列へまとめて表示する常駐アプリ",
             assembly.GetCustomAttribute<AssemblyDescriptionAttribute>()?.Description);
-        Assert.Equal(new Version(1, 1, 0, 0), assembly.GetName().Version);
+        Assert.Equal(new Version(1, 2, 0, 0), assembly.GetName().Version);
         Assert.Equal(
-            "1.1.0",
+            "1.2.0",
             assembly.GetCustomAttribute<AssemblyInformationalVersionAttribute>()?.InformationalVersion);
 
         var metadataKeys = assembly
