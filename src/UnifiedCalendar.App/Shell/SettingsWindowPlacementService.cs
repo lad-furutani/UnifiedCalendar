@@ -79,7 +79,9 @@ public sealed class SettingsWindowPlacementService
         }
 
         var monitor = _monitorProvider.GetMonitorForWindow(handle);
-        var bounds = window.RestoreBounds;
+        var bounds = window.WindowState == WindowState.Normal
+            ? new Rect(window.Left, window.Top, window.ActualWidth, window.ActualHeight)
+            : window.RestoreBounds;
         return new WindowPlacement(
             bounds.Left,
             bounds.Top,
