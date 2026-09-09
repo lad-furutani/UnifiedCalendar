@@ -2,7 +2,7 @@
 
 Google Calendar と Microsoft 365 の予定を、Windows 上の1つの時系列へまとめて表示する参照専用デスクトップアプリです。複数アカウント・複数カレンダーに対応し、タスクトレイに常駐して予定を定期的に更新します。
 
-現在のリリース: **1.0.0**
+現在のリリース: **1.1.0**
 
 ## 主な機能
 
@@ -11,11 +11,12 @@ Google Calendar と Microsoft 365 の予定を、Windows 上の1つの時系列�
 - 表示対象カレンダー、表示日数、文字サイズ、表示密度、色分けルールを設定可能
 - 予定の詳細、元の予定、オンライン会議へのリンクを表示
 - 手動更新、定期更新、スリープ復帰時の更新に対応
+- 予定の開始前に Windows の通知を出す（1.1.0 で追加。ON / OFF と 1〜60 分前を設定可能）
 - オフライン時はローカルキャッシュから直近の予定を表示
 - Windows のライト / ダークテーマ、DPI、ローカルタイムゾーンの変更に追従
 - タスクトレイ常駐、Windows ログオン時の自動起動、単一インスタンス動作
 
-UnifiedCalendar は閲覧に特化しています。アプリ内での予定の作成・編集・削除、検索・絞り込み、通知、印刷・エクスポート、自動アップデート、Push / Webhook 更新は提供しません。
+UnifiedCalendar は閲覧に特化しています。アプリ内での予定の作成・編集・削除、検索・絞り込み、印刷・エクスポート、自動アップデート、Push / Webhook 更新は提供しません。通知は予定の開始前のものだけを提供します（1.1.0 で追加）。同期エラーやレート制限、予定の終了では通知しません。
 
 ## 動作環境
 
@@ -34,8 +35,13 @@ UnifiedCalendar は閲覧に特化しています。アプリ内での予定の�
 リポジトリのルートで次を実行すると、依存関係の復元、Release ビルド、テスト、自己完結型発行を順に行います。
 
 ```powershell
+# このウィンドウでだけスクリプトの実行を許可する（管理者権限は不要）
+Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass
+
 .\build.ps1
 ```
+
+`Set-ExecutionPolicy` を省くと「このシステムではスクリプトの実行が無効になっているため、ファイル … を読み込むことができません」で停止します。`-Scope Process` はこの PowerShell ウィンドウを閉じるまでの一時的な設定で、管理者権限もマシン全体の変更も必要ありません。**ウィンドウを開き直した場合は再度実行してください。** 現在の設定を確認するには `Get-ExecutionPolicy -List` を使用します。
 
 発行物は `artifacts\publish\win-x64` に生成されます。資格情報を設定せずにビルドすることもできますが、その発行物では該当プロバイダーのアカウント追加が無効になり、ビルド終了時に警告が表示されます。
 
@@ -61,10 +67,14 @@ Google の Client ID と Client Secret は必ず同じクライアントの組�
 
 PowerShell セッションで設定してビルドする例:
 
+スクリプトの実行ポリシーについては「開発環境」の手順を参照してください。
+
 ```powershell
 $env:UnifiedCalendar__Google__ClientId = "your-google-client-id"
 $env:UnifiedCalendar__Google__ClientSecret = "your-google-client-secret"
 $env:UnifiedCalendar__Microsoft__ClientId = "your-microsoft-client-id"
+
+Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass
 
 .\build.ps1
 ```
@@ -99,9 +109,11 @@ UnifiedCalendar は社内配布のため Google の審査を受けていませ�
 
 ## インストーラの作成
 
-先に `build.ps1` で発行物を作成し、Inno Setup 6 をインストールしてから実行します。
+先に `build.ps1` で発行物を作成し、Inno Setup 6 をインストールしてから実行します。新しい PowerShell ウィンドウで作業する場合は、「開発環境」の節と同じ一時的な実行許可を設定してください。
 
 ```powershell
+Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass
+
 .\build-installer.ps1
 ```
 
@@ -113,7 +125,7 @@ UnifiedCalendar は社内配布のため Google の審査を受けていませ�
 .\build-installer.ps1 -NoSign -AllowMissingCredentials
 ```
 
-生成先は `artifacts\installer\UnifiedCalendar-Setup-1.0.0.exe` です。インストーラはユーザー単位でインストールされ、管理者権限を必要としません。
+生成先は `artifacts\installer\UnifiedCalendar-Setup-1.1.0.exe` です。インストーラはユーザー単位でインストールされ、管理者権限を必要としません。
 
 ## データとプライバシー
 
@@ -157,7 +169,6 @@ UnifiedCalendar は社内配布のため Google の審査を受けていませ�
 - [製品仕様書](docs/specification.md)
 - [技術設計書](docs/technical-design/README.md)
 - [テスト戦略と受入マトリクス](docs/technical-design/15-testing-and-acceptance.md)
-- [1.0.0 実機受入結果](docs/acceptance-phase8.md)
 - [セキュリティ・プライバシー設計](docs/technical-design/16-security-and-privacy.md)
 
 実装や仕様を変更する場合は、コードとあわせて関連ドキュメントも更新してください。

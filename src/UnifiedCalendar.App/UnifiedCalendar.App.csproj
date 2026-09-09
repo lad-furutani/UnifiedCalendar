@@ -7,7 +7,7 @@
     <ApplicationManifest>app.manifest</ApplicationManifest>
     <!-- WPF hosts the app; Windows Forms is used only for NotifyIcon. ApplicationConfiguration.Initialize is not used, and DPI awareness is declared as PerMonitorV2 in app.manifest. -->
     <NoWarn>$(NoWarn);WFAC010</NoWarn>
-    <Version Condition="'$(Version)' == ''">1.0.0</Version>
+    <Version Condition="'$(Version)' == ''">1.1.0</Version>
     <InformationalVersion>$(Version)</InformationalVersion>
     <IncludeSourceRevisionInInformationalVersion>false</IncludeSourceRevisionInInformationalVersion>
     <Product>UnifiedCalendar</Product>
