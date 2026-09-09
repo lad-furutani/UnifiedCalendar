@@ -128,6 +128,67 @@ public sealed class Phase7bRemediationTests
     }
 
     [Fact]
+    public void StatusButtonsShareHeightAndRefreshTextFitsAtSupportedFontSizes()
+    {
+        _fixture.Invoke(() =>
+        {
+            foreach (var (fontSize, expectedButtonHeight) in new[]
+            {
+                (FontSize: 10, ButtonHeight: 24d),
+                (FontSize: 14, ButtonHeight: 30d),
+                (FontSize: 24, ButtonHeight: 45d),
+            })
+            {
+                var store = new TestSettingsStore
+                {
+                    Settings = new AppSettings(
+                        display: new DisplayPreferences(fontSizeDip: fontSize)),
+                };
+                var settingsService = new ApplicationSettingsService(store);
+                using var viewModel = Phase6Data.CreateViewModel(
+                    new TestCalendarSyncService(),
+                    new MutableTimeProvider(Phase6Data.Now),
+                    settings: store,
+                    dispatcher: new WpfUiDispatcher(Dispatcher.CurrentDispatcher),
+                    settingsService: settingsService);
+                var initialization = viewModel.InitializeAsync(CancellationToken.None);
+                PumpDispatcherUntil(() => initialization.IsCompleted);
+                initialization.GetAwaiter().GetResult();
+                var window = CreateMainWindow(viewModel);
+                window.Show();
+                window.UpdateLayout();
+                var refreshButton = Assert.IsType<Button>(window.FindName("RefreshButton"));
+                var warningButton = Assert.IsType<Button>(window.FindName("WarningButton"));
+                var settingsButton = Assert.IsType<Button>(window.FindName("SettingsButton"));
+                var legacyRefreshProbe = MeasureLike(
+                    refreshButton,
+                    padding: new Thickness(10d, 5d, 10d, 5d));
+                var fittedRefreshProbe = MeasureLike(refreshButton);
+
+                Assert.Equal("今すぐ更新", refreshButton.Content);
+                Assert.Equal(new Thickness(10d, 4d, 10d, 4d), refreshButton.Padding);
+                Assert.Equal(expectedButtonHeight, warningButton.Height, precision: 6);
+                Assert.Equal(expectedButtonHeight, refreshButton.Height, precision: 6);
+                Assert.Equal(expectedButtonHeight, settingsButton.Height, precision: 6);
+                Assert.Equal(
+                    2d,
+                    legacyRefreshProbe.DesiredSize.Height - fittedRefreshProbe.DesiredSize.Height,
+                    precision: 6);
+                Assert.True(
+                    fittedRefreshProbe.DesiredSize.Height <= refreshButton.Height,
+                    string.Format(
+                        System.Globalization.CultureInfo.InvariantCulture,
+                        "Refresh text must fit: font={0}, desired={1:F2}, fixed={2:F2}.",
+                        fontSize,
+                        fittedRefreshProbe.DesiredSize.Height,
+                        refreshButton.Height));
+
+                window.Close();
+            }
+        });
+    }
+
+    [Fact]
     public void CategoryShellProvidesSingleVisibleScrollPathAtMinimumSize()
     {
         _fixture.Invoke(() =>
@@ -332,7 +393,10 @@ public sealed class Phase7bRemediationTests
     private static double InvokeMetric(MethodInfo method, double fontSize) =>
         Assert.IsType<double>(method.Invoke(null, [fontSize]));
 
-    private static Button MeasureLike(Button source, double? fontSize = null)
+    private static Button MeasureLike(
+        Button source,
+        double? fontSize = null,
+        Thickness? padding = null)
     {
         var probe = new Button
         {
@@ -340,7 +404,7 @@ public sealed class Phase7bRemediationTests
             FontFamily = source.FontFamily,
             FontSize = fontSize ?? source.FontSize,
             FontWeight = source.FontWeight,
-            Padding = source.Padding,
+            Padding = padding ?? source.Padding,
         };
         probe.Measure(new Size(double.PositiveInfinity, double.PositiveInfinity));
         return probe;

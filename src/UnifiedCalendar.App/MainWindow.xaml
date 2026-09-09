@@ -203,7 +203,8 @@
                         Visibility="{Binding HasAccountWarnings, Converter={StaticResource BooleanVisibility}}" />
                 <Button x:Name="RefreshButton"
                         Grid.Column="3"
-                        Padding="10,5"
+                        Height="{Binding WarningButtonHeight}"
+                        Padding="10,4"
                         KeyboardNavigation.TabIndex="0"
                         Command="{Binding ManualRefreshCommand}"
                         Content="{Binding ManualRefreshText}">

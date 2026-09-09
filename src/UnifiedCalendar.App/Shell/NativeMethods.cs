@@ -7,11 +7,6 @@ internal static class NativeMethods
     internal const int GwlStyle = -16;
     internal const long WsMaximizeBox = 0x00010000L;
     internal const uint MonitorDefaultToNearest = 0x00000002;
-    internal const uint SwpNoActivate = 0x0010;
-    internal const uint SwpFrameChanged = 0x0020;
-    internal const uint SwpNoMove = 0x0002;
-    internal const uint SwpNoSize = 0x0001;
-    internal const uint SwpNoZOrder = 0x0004;
     internal delegate bool MonitorEnumProcedure(
         nint monitor,
         nint deviceContext,
@@ -45,20 +40,6 @@ internal static class NativeMethods
 
     [DllImport("user32.dll", EntryPoint = "GetWindowLongPtrW")]
     internal static extern nint GetWindowLongPtr(nint window, int index);
-
-    [DllImport("user32.dll", EntryPoint = "SetWindowLongPtrW")]
-    internal static extern nint SetWindowLongPtr(nint window, int index, nint value);
-
-    [DllImport("user32.dll")]
-    [return: MarshalAs(UnmanagedType.Bool)]
-    internal static extern bool SetWindowPos(
-        nint window,
-        nint insertAfter,
-        int x,
-        int y,
-        int width,
-        int height,
-        uint flags);
 
     [DllImport("user32.dll")]
     [return: MarshalAs(UnmanagedType.Bool)]

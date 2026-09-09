@@ -135,7 +135,6 @@ public partial class MainWindow : Window
     {
         var handle = new WindowInteropHelper(this).Handle;
         _windowSource = HwndSource.FromHwnd(handle);
-        DisableMaximizeButton(handle);
 
         if (_placementInitialized)
         {
@@ -667,27 +666,6 @@ public partial class MainWindow : Window
                 "Runtime",
                 exception.GetType().Name);
         }
-    }
-
-    private static void DisableMaximizeButton(nint handle)
-    {
-        var style = NativeMethods.GetWindowLongPtr(handle, NativeMethods.GwlStyle).ToInt64();
-        _ = NativeMethods.SetWindowLongPtr(
-            handle,
-            NativeMethods.GwlStyle,
-            new nint(style & ~NativeMethods.WsMaximizeBox));
-        _ = NativeMethods.SetWindowPos(
-            handle,
-            0,
-            0,
-            0,
-            0,
-            0,
-            NativeMethods.SwpFrameChanged
-                | NativeMethods.SwpNoActivate
-                | NativeMethods.SwpNoMove
-                | NativeMethods.SwpNoSize
-                | NativeMethods.SwpNoZOrder);
     }
 
     private static T? FindAncestor<T>(DependencyObject? child)

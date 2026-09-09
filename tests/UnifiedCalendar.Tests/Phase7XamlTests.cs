@@ -720,7 +720,7 @@ public sealed class Phase7XamlTests
             Assert.Equal(ResizeMode.CanResize, window.ResizeMode);
             var handle = new WindowInteropHelper(window).Handle;
             var style = NativeMethods.GetWindowLongPtr(handle, NativeMethods.GwlStyle).ToInt64();
-            Assert.Equal(0L, style & NativeMethods.WsMaximizeBox);
+            Assert.NotEqual(0L, style & NativeMethods.WsMaximizeBox);
 
             var list = Assert.IsType<ListBox>(window.FindName("TimelineList"));
             var stickyOverlay = Assert.IsType<Border>(window.FindName("StickyDateOverlay"));
