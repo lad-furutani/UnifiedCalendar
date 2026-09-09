@@ -959,6 +959,10 @@ public sealed class Phase7XamlTests
 
         public bool Visible { get; set; }
 
+        public void ShowBalloonTip(int timeoutMilliseconds, string title, string text)
+        {
+        }
+
         public void RaiseDoubleClick() => DoubleClick?.Invoke(this, EventArgs.Empty);
 
         public void Dispose()

@@ -324,13 +324,14 @@ public sealed class Phase7ShellTests
     }
 
     [Fact]
-    public void TrayAdapterContractHasNoNotificationOrMutableIconApi()
+    public void TrayAdapterContractExposesBalloonMethodWithoutMutableNotificationOrIconApi()
     {
         var memberNames = typeof(ITrayIconAdapter).GetMembers().Select(member => member.Name).ToArray();
 
-        Assert.DoesNotContain("ShowBalloonTip", memberNames);
+        Assert.Contains("ShowBalloonTip", memberNames);
         Assert.DoesNotContain("BalloonTipText", memberNames);
         Assert.DoesNotContain("BalloonTipTitle", memberNames);
+        Assert.DoesNotContain("BalloonTipClicked", memberNames);
         Assert.DoesNotContain("Icon", memberNames);
         Assert.DoesNotContain("PlaySound", memberNames);
     }

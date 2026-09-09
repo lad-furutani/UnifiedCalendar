@@ -66,7 +66,8 @@ internal static class StorageSamples
                     ColorRuleCondition.ForTitle(TextMatchKind.Contains, "meeting"),
                 ],
                 RgbColor.Parse("#A1B2C3")),
-        ]);
+        ],
+        new NotificationPreferences(enabled: false, leadMinutes: 45));
 
     public static AccountCache CreateGoogleCache(Guid? accountId = null)
     {

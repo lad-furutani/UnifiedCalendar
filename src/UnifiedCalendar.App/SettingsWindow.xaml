@@ -1341,6 +1341,28 @@
                           SelectedItem="{Binding SelectedInterval, Mode=TwoWay}" />
             </StackPanel>
         </DataTemplate>
+        <DataTemplate DataType="{x:Type viewModels:NotificationSettingsViewModel}">
+            <StackPanel>
+                <CheckBox Margin="{x:Static presentation:LayoutMetrics.SettingsSectionMargin}"
+                          IsChecked="{Binding Enabled, Mode=TwoWay}"
+                          Content="{Binding EnabledText}" />
+                <StackPanel Margin="{x:Static presentation:LayoutMetrics.SettingsFieldMargin}"
+                            IsEnabled="{Binding IsLeadMinutesEnabled}">
+                    <TextBlock Margin="{x:Static presentation:LayoutMetrics.SettingsLabelMargin}"
+                               Text="{Binding LeadMinutesText}" />
+                    <StackPanel Orientation="Horizontal">
+                        <controls:IntegerSpinner Width="{x:Static presentation:LayoutMetrics.SettingsSpinnerWidth}"
+                                                 HorizontalAlignment="Left"
+                                                 Minimum="{x:Static persistence:NotificationPreferences.MinimumLeadMinutes}"
+                                                 Maximum="{x:Static persistence:NotificationPreferences.MaximumLeadMinutes}"
+                                                 Value="{Binding LeadMinutes, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                        <TextBlock Margin="{x:Static presentation:LayoutMetrics.SettingsInlineItemMargin}"
+                                   VerticalAlignment="Center"
+                                   Text="{Binding LeadMinutesUnitText}" />
+                    </StackPanel>
+                </StackPanel>
+            </StackPanel>
+        </DataTemplate>
         <DataTemplate DataType="{x:Type viewModels:GeneralSettingsViewModel}">
             <StackPanel>
                 <CheckBox Margin="{x:Static presentation:LayoutMetrics.SettingsSectionMargin}"

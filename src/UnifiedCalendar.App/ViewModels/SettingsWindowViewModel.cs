@@ -56,6 +56,7 @@ public sealed partial class SettingsWindowViewModel : ObservableObject, IDisposa
             brushCache,
             textService);
         Update = new UpdateSettingsViewModel(settingsService, textService);
+        Notifications = new NotificationSettingsViewModel(settingsService, textService);
         General = new GeneralSettingsViewModel(
             settingsService,
             _startupRegistration,
@@ -98,6 +99,10 @@ public sealed partial class SettingsWindowViewModel : ObservableObject, IDisposa
                 new("display", textService.Get(UiResourceKeys.SettingsDisplay), Display),
                 new("color-rules", textService.Get(UiResourceKeys.SettingsColorRules), ColorRules),
                 new("update", textService.Get(UiResourceKeys.SettingsUpdate), Update),
+                new(
+                    "notifications",
+                    textService.Get(UiResourceKeys.SettingsNotifications),
+                    Notifications),
                 new("general", textService.Get(UiResourceKeys.SettingsGeneral), General),
             ]));
         SelectedCategory = Categories[0];
@@ -131,6 +136,8 @@ public sealed partial class SettingsWindowViewModel : ObservableObject, IDisposa
 
     public UpdateSettingsViewModel Update { get; }
 
+    public NotificationSettingsViewModel Notifications { get; }
+
     public GeneralSettingsViewModel General { get; }
 
     public ColorRulesSettingsViewModel ColorRules { get; }
@@ -157,6 +164,7 @@ public sealed partial class SettingsWindowViewModel : ObservableObject, IDisposa
         var settings = await _settingsService.LoadAsync(cancellationToken).ConfigureAwait(true);
         Display.Initialize(settings);
         Update.Initialize(settings);
+        Notifications.Initialize(settings);
         General.Initialize(settings);
         Accounts?.Initialize(settings);
         CalendarSelection?.Initialize(settings);
@@ -234,7 +242,8 @@ public sealed partial class SettingsWindowViewModel : ObservableObject, IDisposa
             defaults.General,
             current.Windows,
             current.Accounts,
-            []), cancellationToken).ConfigureAwait(true);
+            [],
+            defaults.Notifications), cancellationToken).ConfigureAwait(true);
         try
         {
             _startupRegistration.SetEnabled(settings.General.StartWithWindows);
@@ -248,6 +257,7 @@ public sealed partial class SettingsWindowViewModel : ObservableObject, IDisposa
         }
         Display.Initialize(settings);
         Update.Initialize(settings);
+        Notifications.Initialize(settings);
         General.Initialize(settings);
         CalendarSelection?.Initialize(settings);
         await ColorRules.InitializeAsync(settings, cancellationToken).ConfigureAwait(true);
@@ -265,6 +275,7 @@ public sealed partial class SettingsWindowViewModel : ObservableObject, IDisposa
     private Task WaitForImmediateSettingsAsync() => Task.WhenAll(
         Display.WaitForPendingUpdatesAsync(),
         Update.WaitForPendingUpdatesAsync(),
+        Notifications.WaitForPendingUpdatesAsync(),
         General.WaitForPendingUpdatesAsync());
 
     partial void OnSelectedCategoryChanged(SettingsCategoryViewModel? value)

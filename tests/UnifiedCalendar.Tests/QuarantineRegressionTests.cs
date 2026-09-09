@@ -1,4 +1,6 @@
 using System.Text;
+using System.Text.Json.Nodes;
+using UnifiedCalendar.Core.Persistence;
 using UnifiedCalendar.Infrastructure.Storage;
 using Xunit;
 
@@ -6,6 +8,32 @@ namespace UnifiedCalendar.Tests;
 
 public sealed class QuarantineRegressionTests
 {
+    [Fact]
+    public async Task ReleasedV1SettingsWithAccountAndRuleMigrateWithoutQuarantine()
+    {
+        using var temporary = new TemporaryAppDirectory();
+        var store = CreateSettingsStore(temporary, new MutableTimeProvider(StorageSamples.Now));
+        await store.SaveAsync(StorageSamples.CreateSettings(), TestContext.Current.CancellationToken);
+        var v1 = JsonNode.Parse(await File.ReadAllTextAsync(
+            temporary.Paths.SettingsFile,
+            Encoding.UTF8,
+            TestContext.Current.CancellationToken))!.AsObject();
+        v1["schemaVersion"] = 1;
+        Assert.True(v1.Remove("notifications"));
+        await File.WriteAllTextAsync(
+            temporary.Paths.SettingsFile,
+            v1.ToJsonString(),
+            new UTF8Encoding(false),
+            TestContext.Current.CancellationToken);
+
+        var actual = await store.LoadAsync(TestContext.Current.CancellationToken);
+
+        Assert.Single(actual.Accounts);
+        Assert.Single(actual.ColorRules);
+        Assert.Equal(new NotificationPreferences(), actual.Notifications);
+        Assert.Empty(Directory.GetFiles(temporary.Paths.RecoveryDirectory));
+    }
+
     [Fact]
     public async Task SameTimestampSourceAndKind_UsesGuidToAvoidFilenameCollisions()
     {

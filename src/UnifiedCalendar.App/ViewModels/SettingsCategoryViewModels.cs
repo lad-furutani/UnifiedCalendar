@@ -293,7 +293,8 @@ public sealed class DisplaySettingsViewModel : ObservableObject
                 current.General,
                 current.Windows,
                 current.Accounts,
-                current.ColorRules);
+                current.ColorRules,
+                current.Notifications);
         }).ConfigureAwait(false);
         if (expanded)
         {
@@ -407,7 +408,134 @@ public sealed class UpdateSettingsViewModel : ObservableObject
             current.General,
             current.Windows,
             current.Accounts,
-            current.ColorRules));
+            current.ColorRules,
+            current.Notifications));
+
+    private Task EnqueueUpdate(Func<Task> update)
+    {
+        lock (_updateGate)
+        {
+            _pendingUpdate = _pendingUpdate
+                .ContinueWith(
+                    _ => update(),
+                    CancellationToken.None,
+                    TaskContinuationOptions.ExecuteSynchronously,
+                    TaskScheduler.Default)
+                .Unwrap();
+            return _pendingUpdate;
+        }
+    }
+
+    private static async void Observe(Task task, string stage)
+    {
+        try
+        {
+            await task.ConfigureAwait(false);
+        }
+        catch (Exception exception)
+        {
+            Log.Warning(
+                "SettingsUpdateFailed {Stage} {ErrorCategory}",
+                stage,
+                exception.GetType().Name);
+        }
+    }
+}
+
+public sealed class NotificationSettingsViewModel : ObservableObject
+{
+    private readonly IApplicationSettingsService _settingsService;
+    private readonly object _updateGate = new();
+    private Task _pendingUpdate = Task.CompletedTask;
+    private bool _initialized;
+    private bool _enabled = true;
+    private int _leadMinutes = 5;
+
+    public NotificationSettingsViewModel(
+        IApplicationSettingsService settingsService,
+        IUiTextService textService)
+    {
+        _settingsService = settingsService ?? throw new ArgumentNullException(nameof(settingsService));
+        ArgumentNullException.ThrowIfNull(textService);
+        EnabledText = textService.Get(UiResourceKeys.SettingsNotificationsEnabled);
+        LeadMinutesText = textService.Get(UiResourceKeys.SettingsNotificationsLeadMinutes);
+        LeadMinutesUnitText = textService.Get(UiResourceKeys.SettingsNotificationsLeadMinutesUnit);
+    }
+
+    public string EnabledText { get; }
+
+    public string LeadMinutesText { get; }
+
+    public string LeadMinutesUnitText { get; }
+
+    public bool Enabled
+    {
+        get => _enabled;
+        set
+        {
+            if (!SetProperty(ref _enabled, value))
+            {
+                return;
+            }
+
+            OnPropertyChanged(nameof(IsLeadMinutesEnabled));
+            if (_initialized)
+            {
+                Observe(
+                    EnqueueUpdate(() => SaveAsync(new NotificationPreferences(value, LeadMinutes))),
+                    "NotificationEnabled");
+            }
+        }
+    }
+
+    public int LeadMinutes
+    {
+        get => _leadMinutes;
+        set
+        {
+            if (value is < NotificationPreferences.MinimumLeadMinutes
+                or > NotificationPreferences.MaximumLeadMinutes)
+            {
+                throw new ArgumentOutOfRangeException(nameof(value));
+            }
+
+            if (SetProperty(ref _leadMinutes, value) && _initialized)
+            {
+                Observe(
+                    EnqueueUpdate(() => SaveAsync(new NotificationPreferences(Enabled, value))),
+                    "NotificationLeadMinutes");
+            }
+        }
+    }
+
+    public bool IsLeadMinutesEnabled => Enabled;
+
+    public void Initialize(AppSettings settings)
+    {
+        ArgumentNullException.ThrowIfNull(settings);
+        _initialized = false;
+        Enabled = settings.Notifications.Enabled;
+        LeadMinutes = settings.Notifications.LeadMinutes;
+        _initialized = true;
+    }
+
+    public Task WaitForPendingUpdatesAsync()
+    {
+        lock (_updateGate)
+        {
+            return _pendingUpdate;
+        }
+    }
+
+    private Task SaveAsync(NotificationPreferences notifications) =>
+        _settingsService.UpdateAsync(current => new AppSettings(
+            current.Display,
+            current.Sync,
+            current.General,
+            current.Windows,
+            current.Accounts,
+            current.ColorRules,
+            notifications));
 
     private Task EnqueueUpdate(Func<Task> update)
     {
@@ -594,7 +722,8 @@ public sealed class GeneralSettingsViewModel : ObservableObject, IDisposable
             new GeneralPreferences(startWithWindows),
             current.Windows,
             current.Accounts,
-            current.ColorRules)).ConfigureAwait(false);
+            current.ColorRules,
+            current.Notifications)).ConfigureAwait(false);
         _startupRegistration.SetEnabled(startWithWindows);
     }
 

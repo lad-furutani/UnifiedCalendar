@@ -75,6 +75,29 @@ public sealed record SyncPreferences
 
 public sealed record GeneralPreferences(bool StartWithWindows = true);
 
+public sealed record NotificationPreferences
+{
+    public const int MinimumLeadMinutes = 1;
+    public const int MaximumLeadMinutes = 60;
+
+    public NotificationPreferences(bool enabled = true, int leadMinutes = 5)
+    {
+        if (leadMinutes is < MinimumLeadMinutes or > MaximumLeadMinutes)
+        {
+            throw new ArgumentOutOfRangeException(
+                nameof(leadMinutes),
+                "Notification lead minutes must be between 1 and 60.");
+        }
+
+        Enabled = enabled;
+        LeadMinutes = leadMinutes;
+    }
+
+    public bool Enabled { get; }
+
+    public int LeadMinutes { get; }
+}
+
 public sealed record WindowPlacement
 {
     public WindowPlacement(
@@ -250,7 +273,8 @@ public sealed class AppSettings
         GeneralPreferences? general = null,
         WindowPreferences? windows = null,
         IEnumerable<AccountSettings>? accounts = null,
-        IEnumerable<ColorRule>? colorRules = null)
+        IEnumerable<ColorRule>? colorRules = null,
+        NotificationPreferences? notifications = null)
     {
         var accountArray = accounts?.ToArray() ?? [];
         var colorRuleArray = colorRules?.ToArray() ?? [];
@@ -283,6 +307,7 @@ public sealed class AppSettings
         Windows = windows ?? new WindowPreferences();
         _accounts = Array.AsReadOnly(accountArray);
         _colorRules = Array.AsReadOnly(colorRuleArray);
+        Notifications = notifications ?? new NotificationPreferences();
     }
 
     public DisplayPreferences Display { get; }
@@ -296,6 +321,8 @@ public sealed class AppSettings
     public IReadOnlyList<AccountSettings> Accounts => _accounts;
 
     public IReadOnlyList<ColorRule> ColorRules => _colorRules;
+
+    public NotificationPreferences Notifications { get; }
 
     public static AppSettings CreateDefault() => new();
 }

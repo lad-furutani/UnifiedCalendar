@@ -779,7 +779,8 @@ public sealed class ColorRulesSettingsViewModel
                 current.General,
                 current.Windows,
                 current.Accounts,
-                rules);
+                rules,
+                current.Notifications);
         }, cancellationToken).ConfigureAwait(true);
 
         _domainRules = settings.ColorRules.ToArray();
@@ -953,7 +954,8 @@ public sealed class ColorRulesSettingsViewModel
                 current.General,
                 current.Windows,
                 current.Accounts,
-                rules);
+                rules,
+                current.Notifications);
         }, cancellationToken).ConfigureAwait(true);
 
         _domainRules = settings.ColorRules.ToArray();

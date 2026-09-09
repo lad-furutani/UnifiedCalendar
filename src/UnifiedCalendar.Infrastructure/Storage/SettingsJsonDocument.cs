@@ -14,6 +14,8 @@ internal sealed class SettingsJsonDocument
 
     public required GeneralJsonDocument General { get; set; }
 
+    public required NotificationsJsonDocument Notifications { get; set; }
+
     public required WindowsJsonDocument Windows { get; set; }
 
     public required List<AccountJsonDocument> Accounts { get; set; }
@@ -27,7 +29,7 @@ internal sealed class SettingsJsonDocument
             throw new InvalidDataException("The settings schema version is not current.");
         }
 
-        if (Display is null || Sync is null || General is null || Windows is null
+        if (Display is null || Sync is null || General is null || Notifications is null || Windows is null
             || Accounts is null || ColorRules is null)
         {
             throw new InvalidDataException("The settings document is missing required sections.");
@@ -39,7 +41,8 @@ internal sealed class SettingsJsonDocument
             General.ToDomain(),
             Windows.ToDomain(),
             Accounts.Select(account => account.ToDomain()),
-            ColorRules.Select(rule => rule.ToDomain()));
+            ColorRules.Select(rule => rule.ToDomain()),
+            Notifications.ToDomain());
     }
 
     public static SettingsJsonDocument FromDomain(AppSettings settings) => new()
@@ -48,6 +51,7 @@ internal sealed class SettingsJsonDocument
         Display = DisplayJsonDocument.FromDomain(settings.Display),
         Sync = SyncJsonDocument.FromDomain(settings.Sync),
         General = GeneralJsonDocument.FromDomain(settings.General),
+        Notifications = NotificationsJsonDocument.FromDomain(settings.Notifications),
         Windows = WindowsJsonDocument.FromDomain(settings.Windows),
         Accounts = settings.Accounts.Select(AccountJsonDocument.FromDomain).ToList(),
         ColorRules = settings.ColorRules.Select(ColorRuleJsonDocument.FromDomain).ToList(),
@@ -100,6 +104,21 @@ internal sealed class GeneralJsonDocument
     public static GeneralJsonDocument FromDomain(GeneralPreferences value) => new()
     {
         StartWithWindows = value.StartWithWindows,
+    };
+}
+
+internal sealed class NotificationsJsonDocument
+{
+    public required bool Enabled { get; set; }
+
+    public required int LeadMinutes { get; set; }
+
+    public NotificationPreferences ToDomain() => new(Enabled, LeadMinutes);
+
+    public static NotificationsJsonDocument FromDomain(NotificationPreferences value) => new()
+    {
+        Enabled = value.Enabled,
+        LeadMinutes = value.LeadMinutes,
     };
 }
 

@@ -7,6 +7,7 @@ using UnifiedCalendar.App.Services;
 using UnifiedCalendar.App.Shell;
 using UnifiedCalendar.App.ViewModels;
 using UnifiedCalendar.App.Sync;
+using UnifiedCalendar.Core.Notifications;
 using UnifiedCalendar.Core.Presentation;
 using UnifiedCalendar.Core.Persistence;
 using UnifiedCalendar.Core.Providers;
@@ -61,6 +62,7 @@ public static class ServiceCollectionExtensions
         services.AddSingleton<ISystemResumeSignal, WindowsSystemResumeSignal>();
         services.AddHostedService<SyncSchedulerHostedService>();
         services.AddHostedService<MinuteRefreshHostedService>();
+        services.AddSingleton<EventNotificationPlanner>();
         services.AddSingleton<IUiTextService, ResourceUiTextService>();
         services.AddSingleton(provider => new WpfUiDispatcher(
             Application.Current?.Dispatcher ?? Dispatcher.CurrentDispatcher));
@@ -124,6 +126,10 @@ public static class ServiceCollectionExtensions
         services.AddSingleton<IMainWindowController>(provider =>
             provider.GetRequiredService<MainWindowController>());
         services.AddSingleton<ITrayIconAdapter, NotifyIconAdapter>();
+        services.AddSingleton<ITrayNotifier>(provider => new TrayNotifier(
+            () => provider.GetRequiredService<ITrayIconAdapter>(),
+            provider.GetRequiredService<IUiTextService>()));
+        services.AddHostedService<EventNotificationHostedService>();
         services.AddSingleton<TrayIconService>();
         services.AddSingleton<BrushCache>();
         services.AddSingleton<SnapshotDiffer>();

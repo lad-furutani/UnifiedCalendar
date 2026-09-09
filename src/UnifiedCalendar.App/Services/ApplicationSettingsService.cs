@@ -12,6 +12,7 @@ public enum SettingsSection
     Windows = 1 << 3,
     Accounts = 1 << 4,
     ColorRules = 1 << 5,
+    Notifications = 1 << 6,
 }
 
 public sealed class ApplicationSettingsChangedEventArgs : EventArgs
@@ -155,6 +156,11 @@ public sealed class ApplicationSettingsService : IApplicationSettingsService
         if (!previous.ColorRules.SequenceEqual(current.ColorRules))
         {
             changed |= SettingsSection.ColorRules;
+        }
+
+        if (previous.Notifications != current.Notifications)
+        {
+            changed |= SettingsSection.Notifications;
         }
 
         return changed;

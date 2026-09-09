@@ -54,12 +54,16 @@
   <data name="Tray.Refresh" xml:space="preserve"><value>今すぐ更新</value></data>
   <data name="Tray.Settings" xml:space="preserve"><value>設定</value></data>
   <data name="Tray.Exit" xml:space="preserve"><value>終了</value></data>
+  <data name="Notification.Title" xml:space="preserve"><value>まもなく開始</value></data>
+  <data name="Notification.Body" xml:space="preserve"><value>{0:HH:mm} {1}</value></data>
+  <data name="Notification.BodyMore" xml:space="preserve"><value>{0:HH:mm} {1} ほか{2}件</value></data>
   <data name="Settings.Title" xml:space="preserve"><value>設定</value></data>
   <data name="Settings.Category.Account" xml:space="preserve"><value>アカウント</value></data>
   <data name="Settings.Category.CalendarSelection" xml:space="preserve"><value>カレンダー選択</value></data>
   <data name="Settings.Category.Display" xml:space="preserve"><value>表示</value></data>
   <data name="Settings.Category.ColorRules" xml:space="preserve"><value>色分けルール</value></data>
   <data name="Settings.Category.Update" xml:space="preserve"><value>更新</value></data>
+  <data name="Settings.Category.Notifications" xml:space="preserve"><value>通知</value></data>
   <data name="Settings.Category.General" xml:space="preserve"><value>一般</value></data>
   <data name="Settings.Placeholder" xml:space="preserve"><value>このカテゴリは後続フェーズで実装します。</value></data>
   <data name="Settings.Accounts.Heading" xml:space="preserve"><value>登録済みアカウント</value></data>
@@ -177,6 +181,9 @@
   <data name="Settings.ColorRules.Error.ComparisonRequired" xml:space="preserve"><value>比較値を入力してください。</value></data>
   <data name="Settings.Update.Interval" xml:space="preserve"><value>自動更新間隔</value></data>
   <data name="Settings.Update.IntervalOption" xml:space="preserve"><value>{0} 分</value></data>
+  <data name="Settings.Notifications.Enabled" xml:space="preserve"><value>予定の開始前に通知する</value></data>
+  <data name="Settings.Notifications.LeadMinutes" xml:space="preserve"><value>通知するタイミング</value></data>
+  <data name="Settings.Notifications.LeadMinutesUnit" xml:space="preserve"><value>分前</value></data>
   <data name="Settings.General.StartWithWindows" xml:space="preserve"><value>Windows へのサインイン時に自動起動する</value></data>
   <data name="Settings.General.ApplicationInfo" xml:space="preserve"><value>アプリ情報</value></data>
   <data name="Settings.General.ApplicationName" xml:space="preserve"><value>アプリ名: {0}</value></data>

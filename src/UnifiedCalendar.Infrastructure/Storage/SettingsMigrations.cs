@@ -96,3 +96,36 @@ public sealed class SettingsSchemaV0ToV1Migration : ISettingsMigration
         throw new SettingsMigrationException($"The pre-release {propertyName} section is not an object.");
     }
 }
+
+public sealed class SettingsSchemaV1ToV2Migration : ISettingsMigration
+{
+    public int FromVersion => 1;
+
+    public int ToVersion => 2;
+
+    public JsonObject Migrate(JsonObject source)
+    {
+        ArgumentNullException.ThrowIfNull(source);
+        var result = (JsonObject)source.DeepClone();
+        result["schemaVersion"] = ToVersion;
+
+        if (!result.TryGetPropertyValue("notifications", out var value) || value is null)
+        {
+            result["notifications"] = new JsonObject
+            {
+                ["enabled"] = true,
+                ["leadMinutes"] = 5,
+            };
+            return result;
+        }
+
+        if (value is not JsonObject notifications)
+        {
+            throw new SettingsMigrationException("The v1 notifications section is not an object.");
+        }
+
+        notifications["enabled"] ??= true;
+        notifications["leadMinutes"] ??= 5;
+        return result;
+    }
+}

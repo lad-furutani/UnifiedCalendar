@@ -87,7 +87,8 @@ public sealed class MainWindowPlacementService
                 current.General,
                 new WindowPreferences(placement, current.Windows.Settings),
                 current.Accounts,
-                current.ColorRules),
+                current.ColorRules,
+                current.Notifications),
             cancellationToken).ConfigureAwait(false);
     }
 }

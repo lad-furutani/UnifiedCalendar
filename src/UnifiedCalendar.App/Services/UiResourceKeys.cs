@@ -32,12 +32,16 @@ public static class UiResourceKeys
     public const string TrayRefresh = "Tray.Refresh";
     public const string TraySettings = "Tray.Settings";
     public const string TrayExit = "Tray.Exit";
+    public const string NotificationTitle = "Notification.Title";
+    public const string NotificationBody = "Notification.Body";
+    public const string NotificationBodyMore = "Notification.BodyMore";
     public const string SettingsTitle = "Settings.Title";
     public const string SettingsAccount = "Settings.Category.Account";
     public const string SettingsCalendarSelection = "Settings.Category.CalendarSelection";
     public const string SettingsDisplay = "Settings.Category.Display";
     public const string SettingsColorRules = "Settings.Category.ColorRules";
     public const string SettingsUpdate = "Settings.Category.Update";
+    public const string SettingsNotifications = "Settings.Category.Notifications";
     public const string SettingsGeneral = "Settings.Category.General";
     public const string SettingsPlaceholder = "Settings.Placeholder";
     public const string SettingsAccountsHeading = "Settings.Accounts.Heading";
@@ -155,6 +159,9 @@ public static class UiResourceKeys
     public const string SettingsColorRulesComparisonRequired = "Settings.ColorRules.Error.ComparisonRequired";
     public const string SettingsUpdateInterval = "Settings.Update.Interval";
     public const string SettingsUpdateIntervalOption = "Settings.Update.IntervalOption";
+    public const string SettingsNotificationsEnabled = "Settings.Notifications.Enabled";
+    public const string SettingsNotificationsLeadMinutes = "Settings.Notifications.LeadMinutes";
+    public const string SettingsNotificationsLeadMinutesUnit = "Settings.Notifications.LeadMinutesUnit";
     public const string SettingsGeneralStartWithWindows = "Settings.General.StartWithWindows";
     public const string SettingsGeneralApplicationInfo = "Settings.General.ApplicationInfo";
     public const string SettingsGeneralApplicationName = "Settings.General.ApplicationName";

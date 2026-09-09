@@ -22,6 +22,7 @@ public static class StorageServiceCollectionExtensions
             return writer;
         });
         services.TryAddEnumerable(ServiceDescriptor.Singleton<ISettingsMigration, SettingsSchemaV0ToV1Migration>());
+        services.TryAddEnumerable(ServiceDescriptor.Singleton<ISettingsMigration, SettingsSchemaV1ToV2Migration>());
         services.TryAddSingleton<ISettingsStore, SettingsJsonStore>();
         services.TryAddSingleton<ICacheStore, AccountCacheJsonStore>();
         services.TryAddSingleton<ITokenStore, DpapiTokenStore>();

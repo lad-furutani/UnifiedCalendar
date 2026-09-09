@@ -619,7 +619,8 @@ public sealed partial class CalendarSelectionSettingsViewModel : ObservableObjec
             current.General,
             current.Windows,
             accounts,
-            current.ColorRules);
+            current.ColorRules,
+            current.Notifications);
     }
 
     private static void ApplyOrderedCollection<T>(

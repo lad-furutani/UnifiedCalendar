@@ -217,12 +217,14 @@ public sealed class Phase7bSettingsWindowTests
             window.Show();
 
             Assert.Equal(
-                ["アカウント", "カレンダー選択", "表示", "色分けルール", "更新", "一般"],
+                ["アカウント", "カレンダー選択", "表示", "色分けルール", "更新", "通知", "一般"],
                 viewModel.Categories.Select(category => category.Title));
-            Assert.IsType<DisplaySettingsViewModel>(viewModel.Categories[2].Content);
-            Assert.IsType<ColorRulesSettingsViewModel>(viewModel.Categories[3].Content);
-            Assert.IsType<UpdateSettingsViewModel>(viewModel.Categories[4].Content);
-            Assert.IsType<GeneralSettingsViewModel>(viewModel.Categories[5].Content);
+            var categories = viewModel.Categories.ToDictionary(category => category.Key);
+            Assert.IsType<DisplaySettingsViewModel>(categories["display"].Content);
+            Assert.IsType<ColorRulesSettingsViewModel>(categories["color-rules"].Content);
+            Assert.IsType<UpdateSettingsViewModel>(categories["update"].Content);
+            Assert.IsType<NotificationSettingsViewModel>(categories["notifications"].Content);
+            Assert.IsType<GeneralSettingsViewModel>(categories["general"].Content);
             Assert.All(
                 viewModel.Categories.Where(category => category.Key is "account" or "calendar-selection"),
                 category => Assert.False(string.IsNullOrWhiteSpace(
@@ -242,7 +244,7 @@ public sealed class Phase7bSettingsWindowTests
             Assert.Equal(4, KeyboardNavigation.GetTabIndex(cancel));
             Assert.Equal(14d, window.FontSize);
 
-            viewModel.SelectedCategory = viewModel.Categories[2];
+            viewModel.SelectedCategory = categories["display"];
             PumpDispatcher();
             window.UpdateLayout();
             var spinners = FindDescendants<IntegerSpinner>(content).ToArray();
@@ -251,12 +253,25 @@ public sealed class Phase7bSettingsWindowTests
             Assert.Equal((10, 24), (spinners[1].Minimum, spinners[1].Maximum));
             Assert.Equal(3, FindDescendants<RadioButton>(content).Count());
 
-            viewModel.SelectedCategory = viewModel.Categories[4];
+            viewModel.SelectedCategory = categories["update"];
             PumpDispatcher();
             window.UpdateLayout();
             Assert.Single(FindDescendants<ComboBox>(content));
 
-            viewModel.SelectedCategory = viewModel.Categories[5];
+            viewModel.SelectedCategory = categories["notifications"];
+            PumpDispatcher();
+            window.UpdateLayout();
+            Assert.Single(FindDescendants<CheckBox>(content));
+            var notificationSpinner = Assert.Single(FindDescendants<IntegerSpinner>(content));
+            Assert.Equal((1, 60), (notificationSpinner.Minimum, notificationSpinner.Maximum));
+            Assert.True(notificationSpinner.IsEnabled);
+            viewModel.Notifications.Enabled = false;
+            PumpDispatcher();
+            window.UpdateLayout();
+            Assert.False(notificationSpinner.IsEnabled);
+            viewModel.Notifications.WaitForPendingUpdatesAsync().GetAwaiter().GetResult();
+
+            viewModel.SelectedCategory = categories["general"];
             PumpDispatcher();
             window.UpdateLayout();
             Assert.Single(FindDescendants<CheckBox>(content));
@@ -277,6 +292,33 @@ public sealed class Phase7bSettingsWindowTests
             window.Close();
             owner.Close();
         });
+    }
+
+    [Fact]
+    public async Task NotificationSettingsSaveEnabledAndLeadMinutesImmediately()
+    {
+        var store = new TestSettingsStore();
+        var settings = new ApplicationSettingsService(store);
+        var viewModel = new NotificationSettingsViewModel(
+            settings,
+            new ResourceUiTextService());
+        viewModel.Initialize(await settings.LoadAsync(TestContext.Current.CancellationToken));
+
+        viewModel.Enabled = false;
+        viewModel.LeadMinutes = NotificationPreferences.MaximumLeadMinutes;
+        await viewModel.WaitForPendingUpdatesAsync();
+
+        Assert.False(store.Settings.Notifications.Enabled);
+        Assert.Equal(NotificationPreferences.MaximumLeadMinutes, store.Settings.Notifications.LeadMinutes);
+        Assert.False(viewModel.IsLeadMinutesEnabled);
+
+        viewModel.Enabled = true;
+        viewModel.LeadMinutes = NotificationPreferences.MinimumLeadMinutes;
+        await viewModel.WaitForPendingUpdatesAsync();
+
+        Assert.True(store.Settings.Notifications.Enabled);
+        Assert.Equal(NotificationPreferences.MinimumLeadMinutes, store.Settings.Notifications.LeadMinutes);
+        Assert.True(viewModel.IsLeadMinutesEnabled);
     }
 
     [Fact]

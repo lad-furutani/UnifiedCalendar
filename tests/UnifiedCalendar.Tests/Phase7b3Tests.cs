@@ -263,6 +263,7 @@ public sealed class Phase7b3Tests
         Assert.Equal(defaults.Display, current.Display);
         Assert.Equal(defaults.Sync, current.Sync);
         Assert.Equal(defaults.General, current.General);
+        Assert.Equal(defaults.Notifications, current.Notifications);
         Assert.Empty(current.ColorRules);
         Assert.Same(initial.Accounts[0], current.Accounts[0]);
         Assert.Equal(initial.Accounts[0].Calendars, current.Accounts[0].Calendars);
@@ -275,8 +276,11 @@ public sealed class Phase7b3Tests
             SettingsSection.Display
                 | SettingsSection.Sync
                 | SettingsSection.General
-                | SettingsSection.ColorRules,
+                | SettingsSection.ColorRules
+                | SettingsSection.Notifications,
             notification.ChangedSections);
+        Assert.Equal(defaults.Notifications.Enabled, settingsViewModel.Notifications.Enabled);
+        Assert.Equal(defaults.Notifications.LeadMinutes, settingsViewModel.Notifications.LeadMinutes);
         Assert.Equal([true], startup.Values);
         Assert.Equal(1, confirmation.ResetPromptCount);
         Assert.DoesNotContain(
@@ -513,7 +517,8 @@ public sealed class Phase7b3Tests
             new GeneralPreferences(false),
             windows,
             [account],
-            [rule]);
+            [rule],
+            new NotificationPreferences(false, 45));
     }
 
     private sealed class RecordingSettingsStore : ISettingsStore

@@ -6,6 +6,7 @@ using UnifiedCalendar.App.Shell;
 using UnifiedCalendar.App.Sync;
 using UnifiedCalendar.App.ViewModels;
 using UnifiedCalendar.Core.Models;
+using UnifiedCalendar.Core.Notifications;
 using UnifiedCalendar.Core.Presentation;
 using UnifiedCalendar.Core.Sync;
 using UnifiedCalendar.Infrastructure.Logging;
@@ -128,6 +129,11 @@ public sealed class CompositionRootTests
         var hostedServices = provider.GetServices<IHostedService>().ToArray();
         Assert.Contains(hostedServices, value => value is SyncSchedulerHostedService);
         Assert.Contains(hostedServices, value => value is MinuteRefreshHostedService);
+        Assert.Contains(hostedServices, value => value is EventNotificationHostedService);
+        Assert.Same(
+            provider.GetRequiredService<EventNotificationPlanner>(),
+            provider.GetRequiredService<EventNotificationPlanner>());
+        Assert.IsType<TrayNotifier>(provider.GetRequiredService<ITrayNotifier>());
     }
 
     [Fact]

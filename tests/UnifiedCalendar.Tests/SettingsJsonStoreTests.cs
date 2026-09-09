@@ -1,5 +1,6 @@
 using System.Text;
 using System.Text.Json.Nodes;
+using Microsoft.Extensions.DependencyInjection;
 using NSubstitute;
 using UnifiedCalendar.Core.Persistence;
 using UnifiedCalendar.Infrastructure.Storage;
@@ -23,6 +24,8 @@ public sealed class SettingsJsonStoreTests
         Assert.Equal("#2F6FED", settings.Display.DefaultEventColor.ToHexString());
         Assert.Equal(5, settings.Sync.IntervalMinutes);
         Assert.True(settings.General.StartWithWindows);
+        Assert.True(settings.Notifications.Enabled);
+        Assert.Equal(5, settings.Notifications.LeadMinutes);
         Assert.Null(settings.Windows.Main);
         Assert.Null(settings.Windows.Settings);
         Assert.Empty(settings.Accounts);
@@ -30,7 +33,7 @@ public sealed class SettingsJsonStoreTests
     }
 
     [Fact]
-    public async Task V1_RoundTripsCompleteSettings_AsBomlessCamelCaseJson()
+    public async Task V2_RoundTripsCompleteSettings_AsBomlessCamelCaseJson()
     {
         using var temporary = new TemporaryAppDirectory();
         var store = CreateStore(temporary);
@@ -45,7 +48,8 @@ public sealed class SettingsJsonStoreTests
             TestContext.Current.CancellationToken);
         Assert.False(bytes.AsSpan().StartsWith(Encoding.UTF8.Preamble));
         var json = Encoding.UTF8.GetString(bytes);
-        Assert.Contains("\"schemaVersion\": 1", json, StringComparison.Ordinal);
+        Assert.Contains("\"schemaVersion\": 2", json, StringComparison.Ordinal);
+        Assert.Contains("\"leadMinutes\": 45", json, StringComparison.Ordinal);
         Assert.Contains("\"density\": \"compact\"", json, StringComparison.Ordinal);
         Assert.Contains("\"provider\": \"google\"", json, StringComparison.Ordinal);
         Assert.DoesNotContain("SchemaVersion", json, StringComparison.Ordinal);
@@ -127,6 +131,7 @@ public sealed class SettingsJsonStoreTests
     [Theory]
     [InlineData("density")]
     [InlineData("startWithWindows")]
+    [InlineData("leadMinutes")]
     public async Task MissingRequiredScalarProperty_IsQuarantinedAsInvalid(string propertyName)
     {
         using var temporary = new TemporaryAppDirectory();
@@ -136,9 +141,12 @@ public sealed class SettingsJsonStoreTests
             temporary.Paths.SettingsFile,
             Encoding.UTF8,
             TestContext.Current.CancellationToken))!.AsObject();
-        var owner = propertyName == "density"
-            ? root["display"]!.AsObject()
-            : root["general"]!.AsObject();
+        var owner = propertyName switch
+        {
+            "density" => root["display"]!.AsObject(),
+            "startWithWindows" => root["general"]!.AsObject(),
+            _ => root["notifications"]!.AsObject(),
+        };
         Assert.True(owner.Remove(propertyName));
         await File.WriteAllTextAsync(
             temporary.Paths.SettingsFile,
@@ -159,7 +167,7 @@ public sealed class SettingsJsonStoreTests
         using var temporary = new TemporaryAppDirectory();
         await File.WriteAllTextAsync(
             temporary.Paths.SettingsFile,
-            "{\"schemaVersion\":9,\"futureData\":true}",
+            "{\"schemaVersion\":3,\"futureData\":true}",
             new UTF8Encoding(false),
             TestContext.Current.CancellationToken);
         var store = CreateStore(temporary);
@@ -168,11 +176,45 @@ public sealed class SettingsJsonStoreTests
 
         Assert.Equal(7, actual.Display.Days);
         Assert.False(File.Exists(temporary.Paths.SettingsFile));
-        Assert.Single(Directory.GetFiles(temporary.Paths.RecoveryDirectory, "settings-*-future-*-future-v9-*.json"));
+        Assert.Single(Directory.GetFiles(temporary.Paths.RecoveryDirectory, "settings-*-future-*-future-v3-*.json"));
     }
 
     [Fact]
-    public async Task OlderSchema_IsMigratedOneVersion_Validated_AndAtomicallySavedAsV1()
+    public async Task V1WithAccountAndColorRule_IsMigratedWithoutQuarantineAndSavedAsV2()
+    {
+        using var temporary = new TemporaryAppDirectory();
+        var store = CreateStore(temporary);
+        await store.SaveAsync(StorageSamples.CreateSettings(), TestContext.Current.CancellationToken);
+        var v1 = JsonNode.Parse(await File.ReadAllTextAsync(
+            temporary.Paths.SettingsFile,
+            Encoding.UTF8,
+            TestContext.Current.CancellationToken))!.AsObject();
+        v1["schemaVersion"] = 1;
+        Assert.True(v1.Remove("notifications"));
+        await File.WriteAllTextAsync(
+            temporary.Paths.SettingsFile,
+            v1.ToJsonString(),
+            new UTF8Encoding(false),
+            TestContext.Current.CancellationToken);
+
+        var actual = await store.LoadAsync(TestContext.Current.CancellationToken);
+
+        Assert.True(actual.Notifications.Enabled);
+        Assert.Equal(5, actual.Notifications.LeadMinutes);
+        Assert.Single(actual.Accounts);
+        Assert.Single(actual.ColorRules);
+        Assert.Empty(Directory.GetFiles(temporary.Paths.RecoveryDirectory));
+        var migrated = JsonNode.Parse(await File.ReadAllTextAsync(
+            temporary.Paths.SettingsFile,
+            Encoding.UTF8,
+            TestContext.Current.CancellationToken))!.AsObject();
+        Assert.Equal(2, migrated["schemaVersion"]!.GetValue<int>());
+        Assert.True(migrated["notifications"]!["enabled"]!.GetValue<bool>());
+        Assert.Equal(5, migrated["notifications"]!["leadMinutes"]!.GetValue<int>());
+    }
+
+    [Fact]
+    public async Task V0Fixture_IsMigratedThroughV1_Validated_AndAtomicallySavedAsV2()
     {
         using var temporary = new TemporaryAppDirectory();
         await File.WriteAllTextAsync(
@@ -187,12 +229,26 @@ public sealed class SettingsJsonStoreTests
         Assert.Equal(12, actual.Display.Days);
         Assert.Equal(14, actual.Display.FontSizeDip);
         Assert.Equal(5, actual.Sync.IntervalMinutes);
+        Assert.True(actual.Notifications.Enabled);
+        Assert.Equal(5, actual.Notifications.LeadMinutes);
         var migrated = JsonNode.Parse(await File.ReadAllTextAsync(
             temporary.Paths.SettingsFile,
             Encoding.UTF8,
             TestContext.Current.CancellationToken));
-        Assert.Equal(1, migrated!["schemaVersion"]!.GetValue<int>());
+        Assert.Equal(2, migrated!["schemaVersion"]!.GetValue<int>());
         Assert.Null(migrated["display"]!["displayDays"]);
+    }
+
+    [Fact]
+    public void PersistenceRegistrationIncludesBothSequentialSettingsMigrations()
+    {
+        var services = new ServiceCollection();
+        services.AddUnifiedCalendarPersistence();
+        using var provider = services.BuildServiceProvider();
+
+        Assert.Equal(
+            [typeof(SettingsSchemaV0ToV1Migration), typeof(SettingsSchemaV1ToV2Migration)],
+            provider.GetServices<ISettingsMigration>().Select(value => value.GetType()));
     }
 
     [Fact]
@@ -351,6 +407,7 @@ public sealed class SettingsJsonStoreTests
         Assert.Equal(expected.Display, actual.Display);
         Assert.Equal(expected.Sync, actual.Sync);
         Assert.Equal(expected.General, actual.General);
+        Assert.Equal(expected.Notifications, actual.Notifications);
         Assert.Equal(expected.Windows, actual.Windows);
         var expectedAccount = Assert.Single(expected.Accounts);
         var actualAccount = Assert.Single(actual.Accounts);

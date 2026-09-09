@@ -6,7 +6,7 @@ namespace UnifiedCalendar.Infrastructure.Storage;
 
 public sealed class SettingsJsonStore : ISettingsStore
 {
-    public const int CurrentSchemaVersion = 1;
+    public const int CurrentSchemaVersion = 2;
 
     private readonly AppPaths _paths;
     private readonly AtomicFileWriter _atomicFileWriter;
@@ -28,7 +28,8 @@ public sealed class SettingsJsonStore : ISettingsStore
             paths,
             timeProvider ?? throw new ArgumentNullException(nameof(timeProvider)),
             _logger);
-        var migrationArray = migrations?.ToArray() ?? [new SettingsSchemaV0ToV1Migration()];
+        var migrationArray = migrations?.ToArray()
+            ?? [new SettingsSchemaV0ToV1Migration(), new SettingsSchemaV1ToV2Migration()];
         if (migrationArray.Any(migration => migration is null))
         {
             throw new ArgumentException("Migrations cannot contain null elements.", nameof(migrations));

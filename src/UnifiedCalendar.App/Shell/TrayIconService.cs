@@ -3,6 +3,7 @@ using System.Windows.Forms;
 using Serilog;
 using UnifiedCalendar.App.Services;
 using UnifiedCalendar.App.ViewModels;
+using UnifiedCalendar.Core.Notifications;
 
 namespace UnifiedCalendar.App.Shell;
 
@@ -13,6 +14,8 @@ public interface ITrayIconAdapter : IDisposable
     ContextMenuStrip? ContextMenu { get; set; }
 
     bool Visible { get; set; }
+
+    void ShowBalloonTip(int timeoutMilliseconds, string title, string text);
 }
 
 public sealed class NotifyIconAdapter : ITrayIconAdapter
@@ -60,6 +63,9 @@ public sealed class NotifyIconAdapter : ITrayIconAdapter
         set => _notifyIcon.Visible = value;
     }
 
+    public void ShowBalloonTip(int timeoutMilliseconds, string title, string text) =>
+        _notifyIcon.ShowBalloonTip(timeoutMilliseconds, title, text, ToolTipIcon.Info);
+
     public void Dispose()
     {
         if (_disposed)
@@ -86,6 +92,57 @@ public sealed class NotifyIconAdapter : ITrayIconAdapter
         using var stream = resource.Stream;
         using var selectedFrame = new Icon(stream, SystemInformation.SmallIconSize);
         return (Icon)selectedFrame.Clone();
+    }
+}
+
+public interface ITrayNotifier
+{
+    void ShowEventStarting(EventNotificationMessage notification);
+}
+
+public sealed class TrayNotifier : ITrayNotifier
+{
+    private const int BodyTruncationLength = 200;
+    private const int BalloonTimeoutMilliseconds = 10_000;
+
+    private readonly Lazy<ITrayIconAdapter> _trayIcon;
+    private readonly IUiTextService _textService;
+
+    public TrayNotifier(ITrayIconAdapter trayIcon, IUiTextService textService)
+        : this(() => trayIcon, textService)
+    {
+    }
+
+    internal TrayNotifier(Func<ITrayIconAdapter> trayIconFactory, IUiTextService textService)
+    {
+        ArgumentNullException.ThrowIfNull(trayIconFactory);
+        _trayIcon = new Lazy<ITrayIconAdapter>(trayIconFactory);
+        _textService = textService ?? throw new ArgumentNullException(nameof(textService));
+    }
+
+    public void ShowEventStarting(EventNotificationMessage notification)
+    {
+        ArgumentNullException.ThrowIfNull(notification);
+        var body = notification.AdditionalCount == 0
+            ? _textService.Get(
+                UiResourceKeys.NotificationBody,
+                notification.LocalStart,
+                notification.Title)
+            : _textService.Get(
+                UiResourceKeys.NotificationBodyMore,
+                notification.LocalStart,
+                notification.Title,
+                notification.AdditionalCount);
+        if (body.Length > BodyTruncationLength)
+        {
+            body = body[..BodyTruncationLength] + "…";
+        }
+
+        // Recent Windows versions choose the actual display duration, but the API still requires a value.
+        _trayIcon.Value.ShowBalloonTip(
+            BalloonTimeoutMilliseconds,
+            _textService.Get(UiResourceKeys.NotificationTitle),
+            body);
     }
 }
 
