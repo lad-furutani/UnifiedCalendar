@@ -7,7 +7,7 @@ public static class LayoutMetrics
     public const double DipsPerInch = 96d;
     public const double InitialMainWidth = 820d;
     public const double InitialMainHeight = 640d;
-    public const double MinimumMainWidth = 560d;
+    public const double MinimumMainWidth = 370d;
     public const double MinimumMainHeight = 400d;
     public const double InitialSettingsWidth = 760d;
     public const double InitialSettingsHeight = 560d;

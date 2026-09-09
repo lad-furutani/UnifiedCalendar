@@ -87,6 +87,24 @@ public sealed class Phase7ShellTests
     }
 
     [Fact]
+    public void SavedWidthJustBelowNewMinimumIsExpandedTo370Dip()
+    {
+        var saved = new WindowPlacement(
+            100d,
+            80d,
+            369d,
+            500d,
+            PrimaryMonitor.DeviceName,
+            96d,
+            96d);
+
+        var restored = WindowPlacementCalculator.RestoreMainWindow(saved, [PrimaryMonitor]);
+
+        Assert.Equal(370d, restored.Width);
+        Assert.Equal(500d, restored.Height);
+    }
+
+    [Fact]
     public void SavedDpiConvertsPositionButKeepsDipSize()
     {
         var saved = new WindowPlacement(

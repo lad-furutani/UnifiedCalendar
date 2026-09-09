@@ -397,8 +397,9 @@ public sealed class Phase7d1Tests
         var restorationCountBeforeLowerRule = viewport.Restorations.Count;
         await SaveNewTitleRuleAsync(colorRules, "Lower enabled", "match", lowerColor, true);
         await Phase6Data.WaitUntilAsync(() =>
-            viewport.Restorations.Count == restorationCountBeforeLowerRule + 1);
+            viewport.Restorations.Count >= restorationCountBeforeLowerRule + 1);
 
+        Assert.Equal(restorationCountBeforeLowerRule + 1, viewport.Restorations.Count);
         Assert.Equal(firstEnabledColor, FindPresented(main, matched.Key).BackgroundColor);
         Assert.Equal(defaultColor, FindPresented(main, unmatched.Key).BackgroundColor);
         Assert.Equal(["Disabled", "First enabled", "Lower enabled"], colorRules.Rules.Select(row => row.Name));

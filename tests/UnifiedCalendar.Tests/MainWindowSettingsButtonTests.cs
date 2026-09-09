@@ -113,7 +113,7 @@ public sealed class MainWindowSettingsButtonTests
                 var statusTexts = statusGrid.Children.OfType<TextBlock>().ToArray();
 
                 Assert.Equal(820d, LayoutMetrics.InitialMainWidth);
-                Assert.Equal(560d, LayoutMetrics.MinimumMainWidth);
+                Assert.Equal(370d, LayoutMetrics.MinimumMainWidth);
                 Assert.Equal(LayoutMetrics.InitialMainWidth, window.Width);
                 Assert.Equal(LayoutMetrics.MinimumMainWidth, window.MinWidth);
                 Assert.Equal(LayoutMetrics.StatusHeight, statusArea.ActualHeight);
@@ -121,8 +121,8 @@ public sealed class MainWindowSettingsButtonTests
 
                 Assert.Equal(5, statusGrid.ColumnDefinitions.Count);
                 Assert.Equal(GridUnitType.Auto, statusGrid.ColumnDefinitions[0].Width.GridUnitType);
-                Assert.Equal(GridUnitType.Auto, statusGrid.ColumnDefinitions[1].Width.GridUnitType);
-                Assert.Equal(GridUnitType.Star, statusGrid.ColumnDefinitions[2].Width.GridUnitType);
+                Assert.Equal(GridUnitType.Star, statusGrid.ColumnDefinitions[1].Width.GridUnitType);
+                Assert.Equal(GridUnitType.Auto, statusGrid.ColumnDefinitions[2].Width.GridUnitType);
                 Assert.Equal(GridUnitType.Auto, statusGrid.ColumnDefinitions[3].Width.GridUnitType);
                 Assert.Equal(GridUnitType.Auto, statusGrid.ColumnDefinitions[4].Width.GridUnitType);
                 Assert.Contains(statusTexts, text => Grid.GetColumn(text) == 0);
@@ -134,6 +134,7 @@ public sealed class MainWindowSettingsButtonTests
 
                 Assert.Equal(32d, settingsButton.Width);
                 Assert.Equal(viewModel.WarningButtonHeight, settingsButton.Height);
+                Assert.Equal(new Thickness(8d, 0d, 0d, 0d), settingsButton.Margin);
                 Assert.Equal("Segoe MDL2 Assets", settingsButton.FontFamily.Source);
                 Assert.Equal(14d, settingsButton.FontSize);
                 Assert.Equal("\uE713", settingsButton.Content);

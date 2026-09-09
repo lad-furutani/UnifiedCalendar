@@ -168,21 +168,25 @@
             <Grid>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="Auto" />
-                    <ColumnDefinition Width="Auto" />
                     <ColumnDefinition Width="*" />
                     <ColumnDefinition Width="Auto" />
                     <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="Auto" />
                 </Grid.ColumnDefinitions>
-                <TextBlock Grid.Column="0"
+                <TextBlock x:Name="CurrentTimeTextBlock"
+                           Grid.Column="0"
                            Margin="0,0,16,0"
                            VerticalAlignment="Center"
                            FontWeight="SemiBold"
                            Text="{Binding CurrentTimeText}" />
-                <TextBlock Grid.Column="1"
+                <TextBlock x:Name="LastUpdateTextBlock"
+                           Grid.Column="1"
                            Margin="0,0,16,0"
                            VerticalAlignment="Center"
                            Foreground="{DynamicResource SecondaryTextBrush}"
                            Text="{Binding LastUpdateText}"
+                           TextTrimming="CharacterEllipsis"
+                           TextWrapping="NoWrap"
                            Visibility="{Binding HasLastUpdate, Converter={StaticResource BooleanVisibility}}" />
                 <Button x:Name="WarningButton"
                         Grid.Column="2"
@@ -190,7 +194,6 @@
                         Height="{Binding WarningButtonHeight}"
                         Margin="0,0,10,0"
                         Padding="4"
-                        HorizontalAlignment="Left"
                         VerticalAlignment="Center"
                         AutomationProperties.Name="{Binding AccountWarningsText}"
                         Click="WarningButtonClick"
@@ -253,6 +256,7 @@
                         Grid.Column="4"
                         Width="32"
                         Height="{Binding WarningButtonHeight}"
+                        Margin="8,0,0,0"
                         VerticalAlignment="Center"
                         AutomationProperties.Name="{Binding SettingsText}"
                         FontFamily="Segoe MDL2 Assets"
