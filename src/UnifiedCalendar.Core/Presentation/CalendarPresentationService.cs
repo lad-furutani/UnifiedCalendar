@@ -139,7 +139,7 @@ public sealed class CalendarPresentationService
                     }
 
                     localStart = startLocal;
-                    listTime = CreateTimedListTime(timed, startLocal, endLocal);
+                    listTime = CreateTimedListTime(timed, startLocal, endLocal, groupDate);
                     detailDateTime = CreateTimedDetailDateTime(startLocal, endLocal);
                     isAllDay = false;
                     isMultiDay = startDate != DateOnly.FromDateTime(endLocal.DateTime);
@@ -286,15 +286,39 @@ public sealed class CalendarPresentationService
     private static UiText CreateTimedListTime(
         TimedEventTiming timing,
         DateTimeOffset start,
-        DateTimeOffset end)
+        DateTimeOffset end,
+        DateOnly groupDate)
     {
         var startTime = TimeOnly.FromDateTime(start.DateTime);
-        return timing.IsZeroDuration
-            ? UiText.FromResource(UiTextResourceKeys.EventListInstant, startTime)
-            : UiText.FromResource(
+        if (timing.IsZeroDuration)
+        {
+            return UiText.FromResource(UiTextResourceKeys.EventListInstant, startTime);
+        }
+
+        var endTime = TimeOnly.FromDateTime(end.DateTime);
+        var startDate = DateOnly.FromDateTime(start.DateTime);
+        var endDate = DateOnly.FromDateTime(end.DateTime);
+        if (endTime == TimeOnly.MinValue && endDate > DateOnly.MinValue)
+        {
+            endDate = endDate.AddDays(-1);
+        }
+
+        if (endDate < startDate)
+        {
+            endDate = startDate;
+        }
+
+        if (startDate == endDate)
+        {
+            return UiText.FromResource(
                 UiTextResourceKeys.EventListTimedRange,
                 startTime,
-                TimeOnly.FromDateTime(end.DateTime));
+                endTime);
+        }
+
+        return startDate == groupDate && endDate == startDate.AddDays(1)
+            ? UiText.FromResource(UiTextResourceKeys.EventListTimedNextDay, startTime, endTime)
+            : UiText.FromResource(UiTextResourceKeys.EventListTimedDateRange, startDate, endDate);
     }
 
     private static UiText CreateTimedDetailDateTime(DateTimeOffset start, DateTimeOffset end)

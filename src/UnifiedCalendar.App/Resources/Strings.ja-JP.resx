@@ -10,6 +10,8 @@
   <data name="DayHeader.Date" xml:space="preserve"><value>{0:M/d(ddd)}</value></data>
   <data name="Event.List.Instant" xml:space="preserve"><value>{0:HH:mm}</value></data>
   <data name="Event.List.TimedRange" xml:space="preserve"><value>{0:HH:mm}–{1:HH:mm}</value></data>
+  <data name="Event.List.TimedNextDay" xml:space="preserve"><value>{0:HH:mm}–翌{1:HH:mm}</value></data>
+  <data name="Event.List.TimedDateRange" xml:space="preserve"><value>{0:M/d}～{1:M/d}</value></data>
   <data name="Event.List.AllDay" xml:space="preserve"><value>終日</value></data>
   <data name="Event.List.AllDayRange" xml:space="preserve"><value>終日  {0:M/d}～{1:M/d}</value></data>
   <data name="Event.Detail.TimedSingleDay" xml:space="preserve"><value>{0:M/d(ddd)} {1:HH:mm} ～ {2:HH:mm}</value></data>

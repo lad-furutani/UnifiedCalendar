@@ -42,6 +42,12 @@ public sealed class Phase6PresentationTests
             "01:00–08:30",
             service.Get(UiTextResourceKeys.EventListTimedRange, one, eightThirty));
         Assert.Equal(
+            "01:00–翌08:30",
+            service.Get(UiTextResourceKeys.EventListTimedNextDay, one, eightThirty));
+        Assert.Equal(
+            "8/27～8/28",
+            service.Get(UiTextResourceKeys.EventListTimedDateRange, date, nextDate));
+        Assert.Equal(
             "8/27(木) 01:00 ～ 08:30",
             service.Get(UiTextResourceKeys.EventDetailTimedSingleDay, date, one, eightThirty));
         Assert.Equal(
@@ -234,45 +240,66 @@ public sealed class Phase6PresentationTests
         Assert.Equal(uri, Assert.Single(launcher.OpenedUris));
     }
 
-    [Fact]
-    public void TimeColumnWidthIncludesLongestMeasuredSampleAndPadding()
+    [Theory]
+    [InlineData(10d)]
+    [InlineData(14d)]
+    [InlineData(18d)]
+    [InlineData(24d)]
+    public void TimeColumnWidthIncludesEveryMeasuredSampleAndPadding(double fontSize)
     {
         var textService = new ResourceUiTextService();
         var calculator = new TimeColumnWidthCalculator(textService);
         var fontFamily = new FontFamily("Yu Gothic UI");
-
-        var width100 = calculator.Calculate(
+        var typeface = new Typeface(
+            fontFamily,
+            FontStyles.Normal,
+            FontWeights.Normal,
+            FontStretches.Normal);
+        var startDate = new DateOnly(2026, 12, 27);
+        var endDate = new DateOnly(2026, 12, 29);
+        var samples = new[]
+        {
+            textService.Get(
+                UiTextResourceKeys.EventListTimedRange,
+                new TimeOnly(8, 30),
+                new TimeOnly(9, 30)),
+            textService.Get(UiTextResourceKeys.EventListAllDay),
+            textService.Get(UiTextResourceKeys.EventListAllDayRange, startDate, endDate),
+            textService.Get(
+                UiTextResourceKeys.EventListTimedNextDay,
+                new TimeOnly(23, 0),
+                new TimeOnly(1, 0)),
+            textService.Get(UiTextResourceKeys.EventListTimedDateRange, startDate, endDate),
+        };
+        var measured = samples
+            .Select(sample => new FormattedText(
+                sample,
+                CultureInfo.GetCultureInfo("ja-JP"),
+                FlowDirection.LeftToRight,
+                typeface,
+                fontSize,
+                Brushes.Black,
+                1d).WidthIncludingTrailingWhitespace)
+            .ToArray();
+        var width = calculator.Calculate(
             fontFamily,
             FontStyles.Normal,
             FontWeights.Normal,
             FontStretches.Normal,
-            14d,
+            fontSize,
             1d);
-        var width200 = calculator.Calculate(
-            fontFamily,
-            FontStyles.Normal,
-            FontWeights.Normal,
-            FontStretches.Normal,
-            14d,
-            2d);
 
-        Assert.True(width100 > LayoutMetrics.TimeColumnHorizontalPadding);
-        Assert.True(width200 > LayoutMetrics.TimeColumnHorizontalPadding);
-        var zeroPaddedSample = textService.Get(
-            UiTextResourceKeys.EventListTimedRange,
-            new TimeOnly(8, 30),
-            new TimeOnly(9, 30));
-        Assert.Equal("08:30–09:30", zeroPaddedSample);
-        var measuredSample = new FormattedText(
-            zeroPaddedSample,
-            CultureInfo.GetCultureInfo("ja-JP"),
-            FlowDirection.LeftToRight,
-            new Typeface(fontFamily, FontStyles.Normal, FontWeights.Normal, FontStretches.Normal),
-            14d,
-            Brushes.Black,
-            1d).WidthIncludingTrailingWhitespace;
-        Assert.True(width100 >= Math.Ceiling(
-            measuredSample + LayoutMetrics.TimeColumnHorizontalPadding));
+        Assert.Equal("08:30–09:30", samples[0]);
+        Assert.Equal("終日  12/27～12/29", samples[2]);
+        Assert.Equal(measured[2], measured.Max());
+        Assert.Equal(
+            Math.Ceiling(measured.Max() + LayoutMetrics.TimeColumnHorizontalPadding),
+            width);
+        Assert.All(
+            measured,
+            sampleWidth => Assert.True(
+                sampleWidth + LayoutMetrics.TimeColumnHorizontalPadding <= width,
+                $"fontSize={fontSize}, width={width}, measured={sampleWidth}"));
     }
 
     [Fact]

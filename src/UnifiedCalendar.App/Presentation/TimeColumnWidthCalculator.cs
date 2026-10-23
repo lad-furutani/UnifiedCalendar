@@ -35,18 +35,26 @@ public sealed class TimeColumnWidthCalculator
             throw new ArgumentOutOfRangeException(nameof(pixelsPerDip));
         }
 
-        var day = new DateOnly(2026, 8, 27);
+        var day = new DateOnly(2026, 12, 27);
         var samples = new[]
         {
             _textService.Get(
                 UiTextResourceKeys.EventListTimedRange,
-                day.ToDateTime(new TimeOnly(8, 30)),
-                day.ToDateTime(new TimeOnly(9, 30))),
+                new TimeOnly(8, 30),
+                new TimeOnly(9, 30)),
             _textService.Get(UiTextResourceKeys.EventListAllDay),
             _textService.Get(
                 UiTextResourceKeys.EventListAllDayRange,
                 day,
-                day.AddDays(2)),
+                new DateOnly(2026, 12, 29)),
+            _textService.Get(
+                UiTextResourceKeys.EventListTimedNextDay,
+                new TimeOnly(23, 0),
+                new TimeOnly(1, 0)),
+            _textService.Get(
+                UiTextResourceKeys.EventListTimedDateRange,
+                day,
+                new DateOnly(2026, 12, 29)),
         };
         var typeface = new Typeface(fontFamily, fontStyle, fontWeight, fontStretch);
         var measured = samples.Max(sample => new FormattedText(

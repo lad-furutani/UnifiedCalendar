@@ -19,7 +19,7 @@
 | ACC-001 | 複数アカウント | Fake 4アカウント統合unit + Google 2/Microsoft 2の手動integration。G/M識別と混在表示。 |
 | ACC-002 | 並び順 | PresentationTheory: 日付、終日、開始、件名、進行中非繰上げ、安定tie-break。 |
 | ACC-003 | 経時表示 | FakeTimeProviderを分進行。進捗増加、endで削除、終日progress null。 |
-| ACC-004 | 複数日 | 終日1件、時刻指定開始日1件、過去開始継続中→今日、終了後削除。 |
+| ACC-004 | 複数日 | 終日1件、時刻指定開始日1件、過去開始継続中→今日、終了後削除。**一覧の時刻欄が翌日終了は『23:00–翌01:00』、2日以上先の終了と過去開始継続中は『8/27～8/29』（1.3.0で追加、11.2.2）。** |
 | ACC-005 | 部分成功 | 2 calendar中1成功1失敗。成功更新、失敗cache保持、該当stateのみwarning。 |
 | ACC-006 | オフライン起動 | cache有/無のStartupOrchestrator + UI state。API未完了でも起動完了。 |
 | ACC-007 | 原子的保存 | Flush後/Replace前のfault injection、旧本体可読、corrupt/future quarantineで継続。 |

@@ -8,6 +8,8 @@ public static class UiTextResourceKeys
     public const string DayHeaderDate = "DayHeader.Date";
     public const string EventListInstant = "Event.List.Instant";
     public const string EventListTimedRange = "Event.List.TimedRange";
+    public const string EventListTimedNextDay = "Event.List.TimedNextDay";
+    public const string EventListTimedDateRange = "Event.List.TimedDateRange";
     public const string EventListAllDay = "Event.List.AllDay";
     public const string EventListAllDayRange = "Event.List.AllDayRange";
     public const string EventDetailTimedSingleDay = "Event.Detail.TimedSingleDay";

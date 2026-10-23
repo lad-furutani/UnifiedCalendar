@@ -265,6 +265,14 @@ public sealed class CalendarPresentationServiceTests
         Assert.Equal(new DateOnly(2026, 8, 27), Find(during, "past-timed").GroupDate);
         Assert.Equal(new DateOnly(2026, 8, 28), Find(during, "future-timed").GroupDate);
         Assert.Equal(UiTextResourceKeys.EventListAllDayRange, Find(during, "all-day").ListTime.ResourceKey);
+        var pastListTime = Find(during, "past-timed").ListTime;
+        Assert.Equal(UiTextResourceKeys.EventListTimedDateRange, pastListTime.ResourceKey);
+        Assert.Equal(new DateOnly(2026, 8, 26), Assert.IsType<DateOnly>(pastListTime.Arguments[0]));
+        Assert.Equal(new DateOnly(2026, 8, 28), Assert.IsType<DateOnly>(pastListTime.Arguments[1]));
+        var futureListTime = Find(during, "future-timed").ListTime;
+        Assert.Equal(UiTextResourceKeys.EventListTimedNextDay, futureListTime.ResourceKey);
+        Assert.Equal(new TimeOnly(23, 0), Assert.IsType<TimeOnly>(futureListTime.Arguments[0]));
+        Assert.Equal(new TimeOnly(1, 0), Assert.IsType<TimeOnly>(futureListTime.Arguments[1]));
         Assert.All(
             new[] { "all-day", "past-timed", "future-timed" },
             id => Assert.Single(during.Days.SelectMany(day => day.Events), item => item.Key.SourceEventId == id));
@@ -280,6 +288,128 @@ public sealed class CalendarPresentationServiceTests
         var allDayEnd = Build(service, source);
         Assert.Empty(allDayEnd.Events);
         Assert.Empty(allDayEnd.Days);
+    }
+
+    [Fact]
+    public void MultiDayTimedListTimeDistinguishesNextDayFromLongerRange()
+    {
+        var nextDay = CreateTimed(
+            "next-day",
+            "Next day",
+            new DateTimeOffset(2026, 8, 27, 23, 0, 0, TimeSpan.Zero),
+            new DateTimeOffset(2026, 8, 28, 1, 0, 0, TimeSpan.Zero));
+        var longer = CreateTimed(
+            "longer",
+            "Longer",
+            new DateTimeOffset(2026, 8, 27, 10, 0, 0, TimeSpan.Zero),
+            new DateTimeOffset(2026, 8, 29, 17, 0, 0, TimeSpan.Zero));
+
+        var result = Build(new[] { nextDay, longer }, Now);
+
+        var nextDayListTime = Find(result, "next-day").ListTime;
+        Assert.Equal(UiTextResourceKeys.EventListTimedNextDay, nextDayListTime.ResourceKey);
+        Assert.Equal(new TimeOnly(23, 0), Assert.IsType<TimeOnly>(nextDayListTime.Arguments[0]));
+        Assert.Equal(new TimeOnly(1, 0), Assert.IsType<TimeOnly>(nextDayListTime.Arguments[1]));
+        var longerListTime = Find(result, "longer").ListTime;
+        Assert.Equal(UiTextResourceKeys.EventListTimedDateRange, longerListTime.ResourceKey);
+        Assert.Equal(new DateOnly(2026, 8, 27), Assert.IsType<DateOnly>(longerListTime.Arguments[0]));
+        Assert.Equal(new DateOnly(2026, 8, 29), Assert.IsType<DateOnly>(longerListTime.Arguments[1]));
+    }
+
+    [Fact]
+    public void MidnightEndNormalizationOnlyChangesTimedListPresentation()
+    {
+        var midnightNextDay = CreateTimed(
+            "midnight-next-day",
+            "Midnight next day",
+            new DateTimeOffset(2026, 8, 27, 22, 0, 0, TimeSpan.Zero),
+            new DateTimeOffset(2026, 8, 28, 0, 0, 0, TimeSpan.Zero));
+        var afterMidnight = CreateTimed(
+            "after-midnight",
+            "After midnight",
+            new DateTimeOffset(2026, 8, 27, 22, 0, 0, TimeSpan.Zero),
+            new DateTimeOffset(2026, 8, 28, 0, 1, 0, TimeSpan.Zero));
+        var midnightTwoDaysLater = CreateTimed(
+            "midnight-two-days-later",
+            "Midnight two days later",
+            new DateTimeOffset(2026, 8, 27, 10, 0, 0, TimeSpan.Zero),
+            new DateTimeOffset(2026, 8, 29, 0, 0, 0, TimeSpan.Zero));
+
+        var result = Build(
+            new[] { midnightNextDay, afterMidnight, midnightTwoDaysLater },
+            Now);
+
+        var first = Find(result, "midnight-next-day");
+        Assert.Equal(UiTextResourceKeys.EventListTimedRange, first.ListTime.ResourceKey);
+        Assert.Equal(new TimeOnly(22, 0), Assert.IsType<TimeOnly>(first.ListTime.Arguments[0]));
+        Assert.Equal(TimeOnly.MinValue, Assert.IsType<TimeOnly>(first.ListTime.Arguments[1]));
+        Assert.True(first.IsMultiDay);
+        Assert.Equal(UiTextResourceKeys.EventDetailTimedRange, first.DetailDateTime.ResourceKey);
+
+        var second = Find(result, "after-midnight");
+        Assert.Equal(UiTextResourceKeys.EventListTimedNextDay, second.ListTime.ResourceKey);
+        Assert.Equal(new TimeOnly(22, 0), Assert.IsType<TimeOnly>(second.ListTime.Arguments[0]));
+        Assert.Equal(new TimeOnly(0, 1), Assert.IsType<TimeOnly>(second.ListTime.Arguments[1]));
+
+        var third = Find(result, "midnight-two-days-later");
+        Assert.Equal(UiTextResourceKeys.EventListTimedNextDay, third.ListTime.ResourceKey);
+        Assert.Equal(new TimeOnly(10, 0), Assert.IsType<TimeOnly>(third.ListTime.Arguments[0]));
+        Assert.Equal(TimeOnly.MinValue, Assert.IsType<TimeOnly>(third.ListTime.Arguments[1]));
+        Assert.True(third.IsMultiDay);
+        Assert.Equal(UiTextResourceKeys.EventDetailTimedRange, third.DetailDateTime.ResourceKey);
+    }
+
+    [Fact]
+    public void NextDayLabelRequiresStartDateToMatchGroupDate()
+    {
+        var startsOnGroupDate = CreateTimed(
+            "starts-on-group-date",
+            "Starts on group date",
+            new DateTimeOffset(2026, 8, 27, 23, 0, 0, TimeSpan.Zero),
+            new DateTimeOffset(2026, 8, 28, 2, 0, 0, TimeSpan.Zero));
+        var startsBeforeGroupDate = CreateTimed(
+            "starts-before-group-date",
+            "Starts before group date",
+            new DateTimeOffset(2026, 8, 26, 23, 0, 0, TimeSpan.Zero),
+            new DateTimeOffset(2026, 8, 28, 2, 0, 0, TimeSpan.Zero));
+
+        var result = Build(new[] { startsOnGroupDate, startsBeforeGroupDate }, Now);
+
+        Assert.Equal(
+            UiTextResourceKeys.EventListTimedNextDay,
+            Find(result, "starts-on-group-date").ListTime.ResourceKey);
+        var pastListTime = Find(result, "starts-before-group-date").ListTime;
+        Assert.Equal(new DateOnly(2026, 8, 27), Find(result, "starts-before-group-date").GroupDate);
+        Assert.Equal(UiTextResourceKeys.EventListTimedDateRange, pastListTime.ResourceKey);
+        Assert.Equal(new DateOnly(2026, 8, 26), Assert.IsType<DateOnly>(pastListTime.Arguments[0]));
+        Assert.Equal(new DateOnly(2026, 8, 28), Assert.IsType<DateOnly>(pastListTime.Arguments[1]));
+    }
+
+    [Fact]
+    public void TimedListTimeUsesLocalDatesWhenUtcDatesDiffer()
+    {
+        var utcPlusNine = TimeZoneInfo.CreateCustomTimeZone(
+            "UTC+09-list-time-test",
+            TimeSpan.FromHours(9),
+            "UTC+09-list-time-test",
+            "UTC+09-list-time-test");
+        var calendarEvent = CreateTimed(
+            "local-single-day",
+            "Local single day",
+            new DateTimeOffset(2026, 8, 27, 23, 30, 0, TimeSpan.Zero),
+            new DateTimeOffset(2026, 8, 28, 0, 30, 0, TimeSpan.Zero));
+
+        var result = Build(
+            new[] { calendarEvent },
+            new DateTimeOffset(2026, 8, 27, 22, 0, 0, TimeSpan.Zero),
+            localTimeZone: utcPlusNine);
+
+        var presented = Assert.Single(result.Events);
+        Assert.Equal(new DateOnly(2026, 8, 28), presented.GroupDate);
+        Assert.Equal(UiTextResourceKeys.EventListTimedRange, presented.ListTime.ResourceKey);
+        Assert.Equal(new TimeOnly(8, 30), Assert.IsType<TimeOnly>(presented.ListTime.Arguments[0]));
+        Assert.Equal(new TimeOnly(9, 30), Assert.IsType<TimeOnly>(presented.ListTime.Arguments[1]));
+        Assert.False(presented.IsMultiDay);
     }
 
     [Fact]
